@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Something Blue — Official Site</title>
+  <meta name="description" content="Something Blue — indie four-piece. New record 'Midnight Tide' out now. Tour dates, music, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- animated star/grain field -->
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top">
+      <span class="brand-mark"></span>
+      Something&nbsp;Blue
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#music">Music</a>
+      <a href="#tour">Tour</a>
+      <a href="#about">Band</a>
+      <a href="#contact" class="nav-cta">Newsletter</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <p class="eyebrow reveal">New record · <em>Midnight Tide</em> · out now</p>
+      <h1 class="hero-title">
+        <span class="reveal" style="--d:0">Something</span>
+        <span class="reveal outline" style="--d:1">Blue</span>
+      </h1>
+      <p class="hero-sub reveal" style="--d:2">
+        A four-piece writing slow-burn songs for late drives and quiet rooms.
+      </p>
+      <div class="hero-actions reveal" style="--d:3">
+        <a class="btn btn-primary" href="#music">Listen now</a>
+        <a class="btn btn-ghost" href="#tour">See tour dates</a>
+      </div>
+      <div class="scroll-hint reveal" style="--d:4" aria-hidden="true">
+        <span>scroll</span><span class="scroll-line"></span>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Midnight Tide</span><span>★</span><span>New Single — "Cold Light"</span><span>★</span>
+        <span>On Tour 2026</span><span>★</span><span>Midnight Tide</span><span>★</span>
+        <span>New Single — "Cold Light"</span><span>★</span><span>On Tour 2026</span><span>★</span>
+      </div>
+    </div>
+
+    <!-- MUSIC -->
+    <section id="music" class="section">
+      <div class="section-head">
+        <span class="section-index">01</span>
+        <h2 class="section-title">Music</h2>
+      </div>
+      <div class="player">
+        <div class="player-art" id="art">
+          <div class="art-disc"></div>
+          <div class="art-glow"></div>
+        </div>
+        <div class="player-body">
+          <p class="player-album">Midnight Tide · LP</p>
+          <ul class="tracklist" id="tracklist">
+            <li data-len="3:42"><span class="t-num">1</span><span class="t-name">Cold Light</span></li>
+            <li data-len="4:08"><span class="t-num">2</span><span class="t-name">Harbor Lines</span></li>
+            <li data-len="3:17"><span class="t-num">3</span><span class="t-name">Slow Tide</span></li>
+            <li data-len="5:01"><span class="t-num">4</span><span class="t-name">Static & Snow</span></li>
+            <li data-len="3:55"><span class="t-num">5</span><span class="t-name">Indigo Hour</span></li>
+            <li data-len="4:36"><span class="t-num">6</span><span class="t-name">Last Ferry Home</span></li>
+          </ul>
+          <div class="player-bar">
+            <button class="play-btn" id="playBtn" aria-pressed="false">
+              <span class="play-ico"></span>
+              <span class="play-label">Play</span>
+            </button>
+            <div class="track-now" id="trackNow">Select a track</div>
+          </div>
+          <div class="stream-links">
+            <a href="#" aria-label="Spotify">Spotify</a>
+            <a href="#" aria-label="Apple Music">Apple Music</a>
+            <a href="#" aria-label="Bandcamp">Bandcamp</a>
+            <a href="#" aria-label="YouTube">YouTube</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOUR -->
+    <section id="tour" class="section">
+      <div class="section-head">
+        <span class="section-index">02</span>
+        <h2 class="section-title">Tour</h2>
+      </div>
+      <ul class="tour-list" id="tourList"><!-- injected by JS --></ul>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section about">
+      <div class="section-head">
+        <span class="section-index">03</span>
+        <h2 class="section-title">The Band</h2>
+      </div>
+      <div class="about-grid">
+        <p class="about-lead reveal-up">
+          Something Blue started in a basement in 2021 — four friends, a borrowed reverb pedal,
+          and a stubborn belief that quiet songs can hit hardest.
+        </p>
+        <p class="about-text reveal-up">
+          Two records and a hundred-odd shows later, the band trades in widescreen guitars,
+          patient drums, and choruses that arrive like weather. <em>Midnight Tide</em> is their
+          most expansive work yet — recorded live to tape over one cold winter on the coast.
+        </p>
+      </div>
+
+      <ul class="members-grid" id="membersGrid"><!-- injected by JS --></ul>
+    </section>
+
+    <!-- CONTACT / NEWSLETTER -->
+    <section id="contact" class="section contact">
+      <div class="contact-card">
+        <h2 class="contact-title">Stay close.</h2>
+        <p class="contact-sub">Tour presales, new songs, and the occasional postcard. No noise.</p>
+        <form class="signup" id="signup" novalidate>
+          <input type="email" id="email" placeholder="you@email.com" aria-label="Email address" required />
+          <button type="submit" class="btn btn-primary">Sign up</button>
+        </form>
+        <p class="form-msg" id="formMsg" role="status"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">Something Blue</div>
+    <div class="socials">
+      <a href="#" aria-label="Instagram">Instagram</a>
+      <a href="#" aria-label="Bandcamp">Bandcamp</a>
+      <a href="#" aria-label="TikTok">TikTok</a>
+    </div>
+    <small>© <span id="year"></span> Something Blue. Made for late nights.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
