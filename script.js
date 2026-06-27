@@ -51,47 +51,6 @@
     revealEls.forEach((el) => io.observe(el));
   }
 
-  /* ---- mini music player (UI demo) ------------------------ */
-  const tracklist = document.getElementById("tracklist");
-  const tracks = Array.from(tracklist.querySelectorAll("li"));
-  const playBtn = document.getElementById("playBtn");
-  const playLabel = playBtn.querySelector(".play-label");
-  const trackNow = document.getElementById("trackNow");
-  const art = document.getElementById("art");
-
-  let current = -1;
-  let playing = false;
-
-  function setTrack(i) {
-    current = i;
-    tracks.forEach((li, idx) => li.classList.toggle("active", idx === i));
-    const name = tracks[i].querySelector(".t-name").textContent;
-    trackNow.textContent = (playing ? "Now playing — " : "Cued — ") + name;
-  }
-
-  function setPlaying(state) {
-    playing = state;
-    playBtn.setAttribute("aria-pressed", String(state));
-    playLabel.textContent = state ? "Pause" : "Play";
-    art.classList.toggle("playing", state);
-    if (current >= 0) {
-      const name = tracks[current].querySelector(".t-name").textContent;
-      trackNow.textContent = (state ? "Now playing — " : "Paused — ") + name;
-    }
-  }
-
-  tracks.forEach((li, i) => {
-    li.addEventListener("click", () => {
-      setTrack(i);
-      setPlaying(true);
-    });
-  });
-
-  playBtn.addEventListener("click", () => {
-    if (current < 0) setTrack(0);
-    setPlaying(!playing);
-  });
-
   /* ---- tour dates (data-driven) --------------------------- */
   const shows = [
     { day: "12", mo: "Jul", city: "Brooklyn, NY", venue: "Music Hall of Williamsburg", sold: false },
