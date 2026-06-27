@@ -279,9 +279,9 @@ main, .nav, .footer { position: relative; z-index: 1; }
 }
 
 
-/* TOUR ----------------------------------------------------- */
-.tour-list { list-style: none; }
-.tour-row {
+/* Shows ----------------------------------------------------- */
+.show-list { list-style: none; }
+.show-row {
   display: grid;
   grid-template-columns: 120px 1fr auto;
   align-items: center;
@@ -290,17 +290,17 @@ main, .nav, .footer { position: relative; z-index: 1; }
   border-top: 1px solid rgba(111,155,255,.14);
   transition: background .25s, padding-left .25s;
 }
-.tour-row:last-child { border-bottom: 1px solid rgba(111,155,255,.14); }
-.tour-row:hover { background: rgba(47,109,240,.08); padding-left: 1.2rem; }
-.tour-date {
+.show-row:last-child { border-bottom: 1px solid rgba(111,155,255,.14); }
+.show-row:hover { background: rgba(47,109,240,.08); padding-left: 1.2rem; }
+.show-date {
   font-family: var(--font-display);
   font-weight: 600;
 }
-.tour-date .day { font-size: 1.6rem; line-height: 1; }
-.tour-date .mo { font-size: .8rem; text-transform: uppercase; letter-spacing: .15em; color: var(--blue-soft); }
-.tour-where .city { font-weight: 700; font-size: 1.15rem; color: var(--ice); }
-.tour-where .venue { font-size: .9rem; color: var(--muted); }
-.tour-cta {
+.show-date .day { font-size: 1.6rem; line-height: 1; }
+.show-date .mo { font-size: .8rem; text-transform: uppercase; letter-spacing: .15em; color: var(--blue-soft); }
+.show-where .city { font-weight: 700; font-size: 1.15rem; color: var(--ice); }
+.show-where .venue { font-size: .9rem; color: var(--muted); }
+.show-cta {
   font-size: .85rem;
   font-weight: 700;
   padding: .55rem 1.2rem;
@@ -309,8 +309,8 @@ main, .nav, .footer { position: relative; z-index: 1; }
   transition: background .25s, border-color .25s, color .25s;
   white-space: nowrap;
 }
-.tour-cta:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
-.tour-cta.sold {
+.show-cta:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+.show-cta.sold {
   opacity: .45;
   pointer-events: none;
   border-style: dashed;
@@ -537,8 +537,8 @@ main, .nav, .footer { position: relative; z-index: 1; }
   .about-grid { grid-template-columns: 1fr; }
   .members-grid { grid-template-columns: repeat(2, 1fr); }
 
-  .tour-row { grid-template-columns: 80px 1fr; gap: 1rem; }
-  .tour-cta { grid-column: 2 / 3; justify-self: start; margin-top: .5rem; }
+  .show-row { grid-template-columns: 80px 1fr; gap: 1rem; }
+  .show-cta { grid-column: 2 / 3; justify-self: start; margin-top: .5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -62,17 +62,17 @@
     { day: "11", mo: "Aug", city: "San Francisco, CA", venue: "The Chapel", sold: false },
   ];
 
-  const tourList = document.getElementById("tourList");
+  const tourList = document.getElementById("showList");
   tourList.innerHTML = shows
     .map(
       (s) => `
-      <li class="tour-row reveal-up">
-        <div class="tour-date"><span class="day">${s.day}</span> <span class="mo">${s.mo}</span></div>
-        <div class="tour-where">
+      <li class="show-row reveal-up">
+        <div class="show-date"><span class="day">${s.day}</span> <span class="mo">${s.mo}</span></div>
+        <div class="show-where">
           <div class="city">${s.city}</div>
           <div class="venue">${s.venue}</div>
         </div>
-        <a href="#" class="tour-cta ${s.sold ? "sold" : ""}">${s.sold ? "Sold out" : "Tickets"}</a>
+        <a href="#" class="show-cta ${s.sold ? "sold" : ""}">${s.sold ? "Sold out" : "Tickets"}</a>
       </li>`
     )
     .join("");
