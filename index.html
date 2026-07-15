@@ -3,107 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Something Blue — Official Site</title>
-  <meta name="description" content="Something Blue — indie four-piece. New record 'Midnight Tide' out now. Tour dates, music, and more." />
+  <title>Something Blue</title>
+  <meta name="description" content="Something Blue — a band. Recording our first record." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- animated star/grain field -->
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- night sky: stars fade in as the page darkens -->
   <canvas id="field" aria-hidden="true"></canvas>
 
   <header class="nav" id="nav">
-    <a class="brand" href="#top">
-      <span class="brand-mark"></span>
-      Something&nbsp;Blue
-    </a>
-    <nav class="nav-links" aria-label="Primary">
-      <a href="#music">Music</a>
+    <a class="brand" href="#top">Something Blue</a>
+    <nav class="nav-links" id="navLinks" aria-label="Primary">
       <a href="#shows">Shows</a>
-      <a href="#about">Band</a>
-      <a href="#contact" class="nav-cta">Newsletter</a>
+      <a href="#record">Record</a>
+      <a href="#band">Band</a>
+      <a href="#stay" class="nav-cta">Newsletter</a>
     </nav>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
       <span></span><span></span><span></span>
     </button>
   </header>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero">
-      <p class="eyebrow reveal">New record · <em>Midnight Tide</em> · out now</p>
-      <h1 class="hero-title">
-        <span class="reveal" style="--d:0">Something</span>
-        <span class="reveal outline" style="--d:1">Blue</span>
-      </h1>
-      <p class="hero-sub reveal" style="--d:2">
-        A four-piece writing slow-burn songs for late drives and quiet rooms.
-      </p>
-      <div class="hero-actions reveal" style="--d:3">
-        <a class="btn btn-primary" href="#music">Listen now</a>
-        <a class="btn btn-ghost" href="#shows">See show dates</a>
+  <main id="main">
+
+    <!-- ══ THE HARBOR ══ identity, live photos, announcements ══ -->
+    <section class="harbor" id="top">
+      <div class="sky" aria-hidden="true"></div>
+
+      <div class="harbor-sky">
+        <h1 class="wordmark">
+          <span class="wm-something">Something</span>
+          <span class="wm-blue">Blue</span>
+        </h1>
       </div>
-      <div class="scroll-hint reveal" style="--d:4" aria-hidden="true">
-        <span>scroll</span><span class="scroll-line"></span>
+
+      <div class="horizon" aria-hidden="true"></div>
+
+      <div class="harbor-water">
+        <!-- live photos, lit like harbor lamps. injected by script.js -->
+        <ul class="lamps" id="lamps" aria-label="The band live"></ul>
+
+        <section class="notices" aria-labelledby="noticesHeading">
+          <h2 class="notices-heading" id="noticesHeading">Notices</h2>
+          <ul class="notice-list" id="noticeList"></ul>
+        </section>
       </div>
     </section>
 
-    <!-- SHOWS -->
-    <section id="shows" class="section">
-      <div class="section-head">
-        <span class="section-index">02</span>
-        <h2 class="section-title">Shows</h2>
+    <!-- ══ SHOWS ══ dates expire, so they come first ══ -->
+    <section class="band-section" id="shows">
+      <div class="inner">
+        <div class="head">
+          <p class="eyebrow" id="showsEyebrow"></p>
+          <h2 class="title">Shows</h2>
+        </div>
+        <div id="showsBody"></div>
       </div>
-      <ul class="show-list" id="showList"><!-- injected by JS --></ul>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="section about">
-      <div class="section-head">
-        <span class="section-index">03</span>
-        <h2 class="section-title">The Band</h2>
-      </div>
-      <div class="about-grid">
-        <p class="about-lead reveal-up">
-          Something Blue started in a basement in 2021 — four friends, a borrowed reverb pedal,
-          and a stubborn belief that quiet songs can hit hardest.
-        </p>
-        <p class="about-text reveal-up">
-          Two records and a hundred-odd shows later, the band trades in widescreen guitars,
-          patient drums, and choruses that arrive like weather. <em>Midnight Tide</em> is their
-          most expansive work yet — recorded live to tape over one cold winter on the coast.
-        </p>
-      </div>
+    <!-- ══ THE RECORD ══ becomes "Listen" once it exists ══ -->
+    <section class="band-section" id="record">
+      <div class="inner">
+        <div class="head">
+          <p class="eyebrow">In progress</p>
+          <h2 class="title">The record</h2>
+        </div>
 
-      <ul class="members-grid" id="membersGrid"><!-- injected by JS --></ul>
+        <div class="record-grid">
+          <p class="lead">We're recording our first record now.</p>
+          <div class="record-detail">
+            <p class="tk-block">
+              <span class="tk">TK</span> What it sounds like, where you're tracking it,
+              and who's making it with you. A paragraph in your own words — this is the
+              most interesting thing about the band right now, so it's worth writing well.
+            </p>
+            <dl class="record-facts">
+              <div class="fact">
+                <dt>Title</dt>
+                <dd><span class="tk">TK</span></dd>
+              </div>
+              <div class="fact">
+                <dt>Studio</dt>
+                <dd><span class="tk">TK</span></dd>
+              </div>
+              <div class="fact">
+                <dt>Out</dt>
+                <dd><span class="tk">TK</span></dd>
+              </div>
+            </dl>
+            <p class="record-cta">
+              The songs land here when they're done.
+              <a href="#stay">Join the list</a> and you'll hear them first.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- CONTACT / NEWSLETTER -->
-    <section id="contact" class="section contact">
-      <div class="contact-card">
-        <h2 class="contact-title">Stay close.</h2>
-        <p class="contact-sub">Tour presales, new songs, and the occasional postcard. No noise.</p>
+    <!-- ══ THE BAND ══ -->
+    <section class="band-section" id="band">
+      <div class="inner">
+        <div class="head">
+          <p class="eyebrow"><span class="tk">TK</span> Together since</p>
+          <h2 class="title">The band</h2>
+        </div>
+
+        <div class="band-grid">
+          <p class="lead tk-block">
+            <span class="tk">TK</span> How the band started, and what you're going for.
+            Two or three sentences. Say the specific thing, not the impressive thing.
+          </p>
+          <p class="body-text tk-block">
+            <span class="tk">TK</span> A second paragraph if you want one — where you play,
+            what you sound like, what you're chasing.
+          </p>
+        </div>
+
+        <!-- roster, injected by script.js -->
+        <ul class="members" id="members"></ul>
+      </div>
+    </section>
+
+    <!-- ══ STAY CLOSE ══ the list has a real job: the record ══ -->
+    <section class="band-section" id="stay">
+      <div class="inner stay-inner">
+        <h2 class="title stay-title">Stay close.</h2>
+        <p class="stay-sub">We'll email when the record's done and when we play. Nothing else.</p>
         <form class="signup" id="signup" novalidate>
-          <input type="email" id="email" placeholder="you@email.com" aria-label="Email address" required />
-          <button type="submit" class="btn btn-primary">Sign up</button>
+          <label class="visually-hidden" for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email" required />
+          <button type="submit" class="btn">Join the list</button>
         </form>
-        <p class="form-msg" id="formMsg" role="status"></p>
+        <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
       </div>
     </section>
+
   </main>
 
   <footer class="footer">
-    <div class="footer-brand">Something Blue</div>
-    <div class="socials">
-      <a href="#" aria-label="Instagram">Instagram</a>
-      <a href="#" aria-label="Bandcamp">Bandcamp</a>
-      <a href="#" aria-label="TikTok">TikTok</a>
-    </div>
-    <small>© <span id="year"></span> Something Blue. Made for late nights.</small>
+    <span class="footer-brand">Something Blue</span>
+    <nav class="footer-links" aria-label="Elsewhere">
+      <a href="#"><span class="tk">TK</span> Instagram</a>
+      <a href="#"><span class="tk">TK</span> Bandcamp</a>
+      <a href="#"><span class="tk">TK</span> Booking</a>
+    </nav>
+    <small>© <span id="year"></span> Something Blue</small>
   </footer>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

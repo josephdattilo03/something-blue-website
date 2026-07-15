@@ -1,266 +1,368 @@
-/* ============================================================
-   Something Blue — interactions
-   ============================================================ */
-(function () {
-  "use strict";
+import {
+  animate,
+  createTimeline,
+  stagger,
+  splitText,
+  utils,
+} from "https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm";
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* ════════════════════════════════════════════════════════════
+   CONTENT — the only part you need to edit.
+   Everything below the CONTENT block is machinery.
 
-  /* ---- footer year ---------------------------------------- */
-  document.getElementById("year").textContent = new Date().getFullYear();
+   "TK" is a newsroom mark for "to come". Anything left as TK
+   renders as an orange chip on the page, so unfinished content
+   can't ship by accident. Replace the text, drop the chip.
+   ════════════════════════════════════════════════════════════ */
 
-  /* ---- sticky nav state ----------------------------------- */
-  const nav = document.getElementById("nav");
-  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 24);
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
+/* NOTICES — announcements, newest first. Appears in the hero.
+   This replaces the marquee. Keep it to 1–3; it's a notice
+   board, not a feed. An empty array [] renders a prompt. */
+const notices = [
+  {
+    date: "TK",                              // e.g. "14 Jul 2026"
+    kind: "Record",                          // Record · Tour · Show · News
+    text: "We're recording our first record.",
+    cta: "What we know",
+    href: "#record",
+  },
+];
 
-  /* ---- mobile menu ---------------------------------------- */
-  const toggle = document.getElementById("navToggle");
-  const links = document.querySelector(".nav-links");
-  const closeMenu = () => {
-    toggle.classList.remove("open");
-    links.classList.remove("open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", () => {
-    const open = links.classList.toggle("open");
-    toggle.classList.toggle("open", open);
-    toggle.setAttribute("aria-expanded", String(open));
+/* SHOWS — upcoming dates, soonest first. An empty array renders
+   the "no dates yet" state, which is honest and stays useful. */
+const shows = [
+  // { date: "12 Sep", city: "Brooklyn, NY", venue: "Venue name", href: "#", sold: false },
+];
+
+/* LIVE — the photo strip along the horizon, right below the fold.
+   Drop files in an /images folder and point src at them; add or
+   remove entries freely. Landscape shots crop best. These are the
+   only warm light on the page, so pick ones with stage light in
+   them if you can. */
+const live = [
+  { src: null, caption: "" },
+  { src: null, caption: "" },
+  { src: null, caption: "" },
+  { src: null, caption: "" },
+  { src: null, caption: "" },
+];
+
+/* BAND — add or remove people freely; the grid adapts. */
+const members = [
+  { name: "TK", role: "TK", photo: null },
+  { name: "TK", role: "TK", photo: null },
+  { name: "TK", role: "TK", photo: null },
+  { name: "TK", role: "TK", photo: null },
+];
+
+/* ════════════════════════════════════════════════════════════
+   MACHINERY
+   ════════════════════════════════════════════════════════════ */
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (sel) => document.querySelector(sel);
+
+const isTK = (v) => !v || String(v).trim().toUpperCase() === "TK";
+const chip = '<span class="tk">TK</span>';
+/* Render a field: real value, or a TK chip plus a hint. */
+const field = (value, hint) => (isTK(value) ? `${chip}${hint}` : escapeHtml(value));
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+/* ── footer year ─────────────────────────────────────────── */
+$("#year").textContent = new Date().getFullYear();
+
+/* ── nav ─────────────────────────────────────────────────── */
+const nav = $("#nav");
+const navToggle = $("#navToggle");
+const navLinks = $("#navLinks");
+
+const onNavScroll = () => nav.classList.toggle("scrolled", window.scrollY > 24);
+onNavScroll();
+window.addEventListener("scroll", onNavScroll, { passive: true });
+
+navToggle.addEventListener("click", () => {
+  const open = navLinks.classList.toggle("open");
+  navToggle.classList.toggle("open", open);
+  navToggle.setAttribute("aria-expanded", String(open));
+  navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+});
+navLinks.addEventListener("click", (e) => {
+  if (e.target.tagName !== "A") return;
+  navLinks.classList.remove("open");
+  navToggle.classList.remove("open");
+  navToggle.setAttribute("aria-expanded", "false");
+  navToggle.setAttribute("aria-label", "Open menu");
+});
+
+/* ── the lamps: live photos along the waterfront ─────────── */
+$("#lamps").innerHTML = live
+  .map(({ src, caption }) => {
+    const inner = src
+      ? `<img src="${escapeHtml(src)}" alt="Something Blue live${
+          caption ? ` — ${escapeHtml(caption)}` : ""
+        }" loading="lazy" />`
+      : `<span class="lamp-empty">Photo TK</span>`;
+    const cap = src && caption ? `<span class="lamp-caption">${escapeHtml(caption)}</span>` : "";
+    return `<li class="lamp">${inner}${cap}</li>`;
+  })
+  .join("");
+
+/* a photo that 404s falls back to the lit lamp rather than a
+   broken-image icon */
+document.querySelectorAll(".lamp img").forEach((img) => {
+  img.addEventListener("error", () => {
+    img.closest(".lamp").innerHTML = `<span class="lamp-empty">Photo TK</span>`;
   });
-  links.addEventListener("click", (e) => {
-    if (e.target.tagName === "A") closeMenu();
-  });
+});
 
-  /* ---- scroll reveal -------------------------------------- */
-  const revealEls = document.querySelectorAll(".reveal, .reveal-up");
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealEls.forEach((el) => el.classList.add("in"));
-  } else {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
-    );
-    revealEls.forEach((el) => io.observe(el));
-  }
+/* ── the notice board ────────────────────────────────────── */
+$("#noticeList").innerHTML = notices.length
+  ? notices
+      .map((n) => {
+        const cta =
+          n.cta && n.href
+            ? `<a class="notice-cta" href="${escapeHtml(n.href)}">${escapeHtml(n.cta)} &rarr;</a>`
+            : `<span></span>`;
+        return `
+          <li class="notice">
+            <span class="notice-date">${field(n.date, "date")}</span>
+            <span class="notice-kind">${field(n.kind, "kind")}</span>
+            <span class="notice-text">${field(n.text, "what's happening")}</span>
+            ${cta}
+          </li>`;
+      })
+      .join("")
+  : `<li class="notice-empty">${chip}Your first announcement goes here — add it to
+     <code>notices</code> in script.js.</li>`;
 
-  /* ---- tour dates (data-driven) --------------------------- */
-  const shows = [
-    { day: "12", mo: "Jul", city: "Brooklyn, NY", venue: "Music Hall of Williamsburg", sold: false },
-    { day: "15", mo: "Jul", city: "Boston, MA", venue: "The Sinclair", sold: true },
-    { day: "19", mo: "Jul", city: "Philadelphia, PA", venue: "Union Transfer", sold: false },
-    { day: "24", mo: "Jul", city: "Chicago, IL", venue: "Thalia Hall", sold: false },
-    { day: "02", mo: "Aug", city: "Denver, CO", venue: "Bluebird Theater", sold: false },
-    { day: "08", mo: "Aug", city: "Los Angeles, CA", venue: "The Roxy", sold: true },
-    { day: "11", mo: "Aug", city: "San Francisco, CA", venue: "The Chapel", sold: false },
-  ];
+/* ── shows ───────────────────────────────────────────────── */
+const showsEyebrow = $("#showsEyebrow");
+const showsBody = $("#showsBody");
 
-  const tourList = document.getElementById("showList");
-  tourList.innerHTML = shows
+if (shows.length) {
+  const n = shows.length;
+  showsEyebrow.textContent = `${n} date${n === 1 ? "" : "s"} on the books`;
+  showsBody.innerHTML = `<ul class="show-list">${shows
     .map(
       (s) => `
-      <li class="show-row reveal-up">
-        <div class="show-date"><span class="day">${s.day}</span> <span class="mo">${s.mo}</span></div>
-        <div class="show-where">
-          <div class="city">${s.city}</div>
-          <div class="venue">${s.venue}</div>
-        </div>
-        <a href="#" class="show-cta ${s.sold ? "sold" : ""}">${s.sold ? "Sold out" : "Tickets"}</a>
+      <li class="show">
+        <span class="show-date">${field(s.date, "date")}</span>
+        <span class="show-where">
+          <span class="show-city">${field(s.city, "city")}</span>
+          <span class="show-venue">${field(s.venue, "venue")}</span>
+        </span>
+        ${
+          s.sold
+            ? `<span class="show-sold">Sold out</span>`
+            : `<a class="show-cta" href="${escapeHtml(s.href || "#")}">Tickets</a>`
+        }
       </li>`
     )
-    .join("");
+    .join("")}</ul>`;
+} else {
+  /* Not a placeholder — this is true right now, so it ships. */
+  showsEyebrow.textContent = "No dates on the books";
+  showsBody.innerHTML = `
+    <div class="shows-empty">
+      <p>We're in the studio. When we play, the dates land here first.</p>
+      <a href="#stay">Get told about the first one</a>
+    </div>`;
+}
 
-  // observe the newly injected rows for reveal
-  if (!reduceMotion && "IntersectionObserver" in window) {
-    const io2 = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            io2.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    tourList.querySelectorAll(".reveal-up").forEach((el) => io2.observe(el));
-  } else {
-    tourList.querySelectorAll(".reveal-up").forEach((el) => el.classList.add("in"));
+/* ── the band ────────────────────────────────────────────── */
+$("#members").innerHTML = members
+  .map(
+    (m) => `
+    <li class="member">
+      <div class="member-photo">
+        ${
+          m.photo
+            ? `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" loading="lazy" />`
+            : `<span class="member-photo-empty">Photo TK</span>`
+        }
+      </div>
+      <div>
+        <span class="member-name">${field(m.name, "Name")}</span>
+        <span class="member-role">${field(m.role, "Instrument")}</span>
+      </div>
+    </li>`
+  )
+  .join("");
+
+document.querySelectorAll(".member-photo img").forEach((img) => {
+  img.addEventListener("error", () => {
+    img.parentElement.innerHTML = `<span class="member-photo-empty">Photo TK</span>`;
+  });
+});
+
+/* ── newsletter ──────────────────────────────────────────── */
+const form = $("#signup");
+const email = $("#email");
+const formMsg = $("#formMsg");
+const validEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const value = email.value.trim();
+  if (!validEmail(value)) {
+    formMsg.textContent = "That email needs an @ and a domain.";
+    formMsg.classList.add("error");
+    email.focus();
+    return;
   }
+  formMsg.classList.remove("error");
+  /* TK — wire this to your list (Buttondown, Mailchimp, etc).
+     Right now it only clears the field. */
+  formMsg.textContent = "You're on the list.";
+  form.reset();
+});
 
-  /* ---- band members (data-driven) ------------------------- */
-  // Drop real photos into an /images folder and point `photo` at them
-  // (e.g. "images/ava.jpg"). If a photo is missing or fails to load, the
-  // card falls back to a gradient tile with the member's initials.
-  // `links` is each member's personal branding — add as many as you like.
-  const members = [
-    {
-      name: "Ava Mercer",
-      role: "vocals, guitar",
-      photo: "images/ava.jpg",
-      links: [
-        { label: "Instagram", href: "#" },
-        { label: "avamercer.com", href: "#" },
-      ],
-    },
-    {
-      name: "Theo Park",
-      role: "guitar, keys",
-      photo: "images/theo.jpg",
-      links: [
-        { label: "Instagram", href: "#" },
-        { label: "SoundCloud", href: "#" },
-      ],
-    },
-    {
-      name: "Lena Cho",
-      role: "bass",
-      photo: "images/lena.jpg",
-      links: [
-        { label: "Instagram", href: "#" },
-        { label: "lenacho.studio", href: "#" },
-      ],
-    },
-    {
-      name: "Sam Ruiz",
-      role: "drums",
-      photo: "images/sam.jpg",
-      links: [
-        { label: "Instagram", href: "#" },
-        { label: "TikTok", href: "#" },
-      ],
-    },
-  ];
+/* ════════════════════════════════════════════════════════════
+   THE LOAD SEQUENCE — dusk falling on the harbor.
+   One timeline: the horizon draws, the wordmark rises, the
+   lamps come on, the notices settle. Nothing loops.
+   ════════════════════════════════════════════════════════════ */
 
-  const initialsOf = (name) =>
-    name
-      .split(/\s+/)
-      .map((p) => p[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
-  const membersGrid = document.getElementById("membersGrid");
-  if (membersGrid) {
-    membersGrid.innerHTML = members
-      .map((m, i) => {
-        const initials = initialsOf(m.name);
-        const linksHtml = m.links
-          .map((l) => `<a href="${l.href}">${l.label}</a>`)
-          .join("");
-        const photoHtml = m.photo
-          ? `<img src="${m.photo}" alt="${m.name}" loading="lazy" />`
-          : `<span class="member-initials">${initials}</span>`;
-        return `
-        <li class="member reveal-up" style="--d:${i}">
-          <div class="member-photo${m.photo ? "" : " fallback"}" data-initials="${initials}">${photoHtml}</div>
-          <div class="member-body">
-            <span class="member-name">${m.name}</span>
-            <span class="member-role">${m.role}</span>
-            <div class="member-links">${linksHtml}</div>
-          </div>
-        </li>`;
-      })
-      .join("");
-
-    // swap a missing/broken photo for a gradient + initials tile
-    membersGrid.querySelectorAll(".member-photo img").forEach((img) => {
-      img.addEventListener("error", () => {
-        const frame = img.parentNode;
-        frame.classList.add("fallback");
-        frame.innerHTML = `<span class="member-initials">${frame.dataset.initials}</span>`;
-      });
-    });
-
-    // observe the newly injected cards for the reveal animation
-    if (!reduceMotion && "IntersectionObserver" in window) {
-      const ioM = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("in");
-              ioM.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
-      membersGrid.querySelectorAll(".reveal-up").forEach((el) => ioM.observe(el));
-    } else {
-      membersGrid.querySelectorAll(".reveal-up").forEach((el) => el.classList.add("in"));
-    }
+const chars = (() => {
+  try {
+    return splitText(".wm-blue", { chars: true }).chars;
+  } catch {
+    return [$(".wm-blue")];
   }
+})();
 
-  /* ---- newsletter form ------------------------------------ */
-  const form = document.getElementById("signup");
-  const email = document.getElementById("email");
-  const msg = document.getElementById("formMsg");
-  const valid = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!valid(email.value.trim())) {
-      msg.textContent = "Hmm — that email doesn't look right.";
-      msg.classList.add("error");
-      email.focus();
-      return;
-    }
-    msg.classList.remove("error");
-    msg.textContent = "You're in. Watch your inbox for tour presales ✦";
-    form.reset();
+if (reduceMotion) {
+  /* already night: everything present, nothing moves */
+  utils.set([".horizon"], { scaleX: 1 });
+  utils.set([chars, ".lamp", ".notice", ".notice-empty", ".notices-heading", ".wm-something"], {
+    opacity: 1,
+    y: 0,
+  });
+} else {
+  utils.set(".horizon", { scaleX: 0 });
+  utils.set([chars, ".wm-something", ".lamp", ".notice", ".notice-empty", ".notices-heading"], {
+    opacity: 0,
   });
 
-  /* ---- starfield canvas ----------------------------------- */
-  const canvas = document.getElementById("field");
+  createTimeline({ defaults: { ease: "outQuint" } })
+    /* the horizon opens from the centre — the light arrives first */
+    .add(".horizon", { scaleX: [0, 1], duration: 1400, ease: "inOutQuint" }, 200)
+    /* BLUE rises out of the water */
+    .add(
+      chars,
+      { y: [34, 0], opacity: [0, 1], duration: 1100, delay: stagger(30, { from: "center" }) },
+      700
+    )
+    .add(".wm-something", { opacity: [0, 1], duration: 900 }, 1000)
+    /* the lamps come on one at a time, left to right */
+    .add(
+      ".lamp",
+      { opacity: [0, 1], scale: [0.94, 1], duration: 800, delay: stagger(110) },
+      1150
+    )
+    .add(".notices-heading", { opacity: [0, 1], duration: 700 }, 1700)
+    .add(
+      [".notice", ".notice-empty"],
+      { opacity: [0, 1], y: [12, 0], duration: 700, delay: stagger(90) },
+      1800
+    );
+}
+
+/* ── scroll reveals ──────────────────────────────────────── */
+if (!reduceMotion && "IntersectionObserver" in window) {
+  const revealTargets = document.querySelectorAll(".show, .member, .fact, .head, .lead");
+  utils.set(revealTargets, { opacity: 0 });
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      const shown = entries.filter((e) => e.isIntersecting).map((e) => e.target);
+      if (!shown.length) return;
+      animate(shown, {
+        opacity: [0, 1],
+        y: [16, 0],
+        duration: 800,
+        delay: stagger(60),
+        ease: "outQuint",
+      });
+      shown.forEach((el) => io.unobserve(el));
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+  );
+  revealTargets.forEach((el) => io.observe(el));
+}
+
+/* ════════════════════════════════════════════════════════════
+   STARS — they only appear once it's actually dark, which is
+   after you've scrolled past the harbor.
+   ════════════════════════════════════════════════════════════ */
+const canvas = $("#field");
+
+if (reduceMotion) {
+  canvas.style.display = "none";
+} else {
   const ctx = canvas.getContext("2d");
+  const harbor = $(".harbor");
   let stars = [];
-  let w, h, raf;
+  let w = 0;
+  let h = 0;
 
   function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    const count = Math.min(140, Math.floor((w * h) / 14000));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const count = Math.min(130, Math.floor((w * h) / 16000));
     stars = Array.from({ length: count }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: Math.random() * 1.4 + 0.3,
-      tw: Math.random() * Math.PI * 2,
-      sp: Math.random() * 0.02 + 0.004,
-      drift: Math.random() * 0.15 + 0.02,
+      r: Math.random() * 1.1 + 0.25,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.015 + 0.004,
     }));
   }
 
   function draw() {
     ctx.clearRect(0, 0, w, h);
     for (const s of stars) {
-      s.tw += s.sp;
-      s.y += s.drift;
-      if (s.y > h + 2) s.y = -2;
-      const a = 0.4 + Math.sin(s.tw) * 0.45;
+      s.phase += s.speed;
+      const a = 0.35 + Math.sin(s.phase) * 0.4;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${190 + s.r * 30}, ${210}, 255, ${a})`;
+      ctx.fillStyle = `rgba(208, 226, 245, ${a})`;
       ctx.fill();
     }
-    raf = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
 
-  if (!reduceMotion) {
-    resize();
-    draw();
-    let t;
-    window.addEventListener("resize", () => {
-      clearTimeout(t);
-      t = setTimeout(resize, 150);
-    });
-  } else {
-    canvas.style.display = "none";
+  /* fade the stars in across the second half of the harbor */
+  function onStarScroll() {
+    const start = harbor.offsetHeight * 0.45;
+    const end = harbor.offsetHeight;
+    const p = (window.scrollY - start) / (end - start);
+    canvas.style.opacity = String(Math.min(1, Math.max(0, p)) * 0.75);
   }
-})();
+
+  resize();
+  draw();
+  onStarScroll();
+  window.addEventListener("scroll", onStarScroll, { passive: true });
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resize();
+      onStarScroll();
+    }, 150);
+  });
+}

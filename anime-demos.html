@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Something Blue — anime.js playground</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#05060f; --ink-2:#0a0f24; --blue-deep:#102a52;
+    --blue:#2f6df0; --blue-soft:#6f9bff; --ice:#cfe1ff; --paper:#eaf0ff;
+    --accent:#ff8a5c; --muted:#7e8bb4;
+    --font-display:"Fraunces",Georgia,serif;
+    --font-body:"Space Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--font-body); color:var(--paper);
+    background:
+      radial-gradient(120% 80% at 20% -10%, #16336b 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 0%, #0b1d44 0%, transparent 50%),
+      linear-gradient(180deg,var(--ink-2) 0%, var(--ink) 100%);
+    background-attachment:fixed; min-height:100vh; padding:3rem 1.5rem 6rem;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page-head{max-width:1100px;margin:0 auto 2.5rem}
+  .page-head h1{font-family:var(--font-display);font-weight:900;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.02em}
+  .page-head p{color:var(--ice);opacity:.8;margin-top:.5rem;max-width:60ch}
+  .page-head .hint{color:var(--muted);font-size:.85rem;margin-top:.75rem}
+
+  .grid{
+    max-width:1100px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));
+    gap:1.25rem;
+  }
+  .demo{
+    position:relative;border:1px solid rgba(111,155,255,.18);border-radius:16px;
+    background:rgba(10,15,36,.55);backdrop-filter:blur(6px);
+    padding:1.1rem 1.25rem 1.4rem;overflow:hidden;cursor:pointer;
+    min-height:210px;display:flex;flex-direction:column;
+    transition:border-color .3s, transform .3s;
+  }
+  .demo:hover{border-color:rgba(111,155,255,.5);transform:translateY(-2px)}
+  .demo .tag{display:flex;align-items:center;gap:.5rem;justify-content:space-between}
+  .demo .name{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue-soft)}
+  .demo .replay{font-size:.68rem;color:var(--muted);letter-spacing:.1em}
+  .demo .desc{font-size:.78rem;color:var(--muted);margin-top:.35rem;line-height:1.45}
+  .stage{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    margin-top:.75rem;min-height:110px;
+  }
+
+  /* the animated text */
+  .sb{
+    font-family:var(--font-display);font-weight:900;line-height:.92;
+    font-size:clamp(2.2rem,7vw,3.4rem);letter-spacing:-.02em;
+    text-align:center;white-space:nowrap;
+  }
+  .sb .word{display:inline-block}
+  .sb .blue{color:var(--blue-soft)}
+  .sb .letter{display:inline-block;position:relative;will-change:transform,opacity}
+  .sb .row{display:block}
+
+  /* outline variant (matches the real hero) */
+  .outline .letter{
+    color:transparent;-webkit-text-stroke:1.5px var(--blue-soft);
+  }
+
+  /* glitch pseudo layers */
+  .glitch .letter{position:relative}
+  .glitch .letter::before,.glitch .letter::after{
+    content:attr(data-ch);position:absolute;left:0;top:0;opacity:.85;
+  }
+  .glitch .letter::before{color:#ff4d6d}
+  .glitch .letter::after{color:#37e0ff}
+
+  /* gradient shimmer */
+  .shimmer .sb-inner{
+    background:linear-gradient(100deg,var(--blue-deep) 0%,var(--ice) 45%,#fff 50%,var(--ice) 55%,var(--blue-deep) 100%);
+    background-size:250% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  svg{overflow:visible}
+  .draw-path{fill:transparent;stroke:var(--blue-soft);stroke-width:2}
+
+  footer{max-width:1100px;margin:2.5rem auto 0;color:var(--muted);font-size:.8rem}
+  code{background:rgba(111,155,255,.12);padding:.1em .4em;border-radius:5px;color:var(--ice);font-size:.85em}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Something&nbsp;Blue — anime.js playground</h1>
+  <p>Nine different ways to animate the wordmark. Some run once, some loop, some react to your cursor.</p>
+  <p class="hint">Click any card to replay it. Tell me which you like and I'll wire it into the real hero.</p>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  Built with <code>anime.js v3</code>. Each effect splits the text into per-letter spans so it can be
+  animated independently — the same technique drops straight into <code>index.html</code>.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+/* ---------- helpers ---------- */
+// Build markup: "Something" + "Blue", each letter a span.
+function buildText(opts = {}){
+  const wrap = document.createElement('div');
+  wrap.className = 'sb' + (opts.extra ? ' ' + opts.extra : '');
+  const inner = document.createElement('span');
+  inner.className = 'sb-inner';
+
+  const words = [
+    { text: 'Something', cls: '' },
+    { text: 'Blue', cls: 'blue' },
+  ];
+  words.forEach((w, wi) => {
+    const wordEl = document.createElement('span');
+    wordEl.className = 'word ' + w.cls;
+    [...w.text].forEach(ch => {
+      const s = document.createElement('span');
+      s.className = 'letter';
+      s.textContent = ch;
+      s.setAttribute('data-ch', ch);
+      wordEl.appendChild(s);
+    });
+    inner.appendChild(wordEl);
+    if (wi === 0){
+      if (opts.stack){ inner.appendChild(document.createElement('br')); }
+      else { inner.appendChild(document.createTextNode(' ')); }
+    }
+  });
+  wrap.appendChild(inner);
+  return wrap;
+}
+
+function card({name, desc, extra, stack, build}){
+  const el = document.createElement('div');
+  el.className = 'demo';
+  el.innerHTML =
+    `<div class="tag"><span class="name">${name}</span><span class="replay">↻ click to replay</span></div>
+     <div class="desc">${desc}</div>
+     <div class="stage"></div>`;
+  const stage = el.querySelector('.stage');
+  const text = build ? build() : buildText({extra, stack});
+  stage.appendChild(text);
+  const run = () => { anim(text, el); };
+  el.addEventListener('click', run);
+  // store the runner + a small delay so they cascade on load
+  el._run = run;
+  let anim;
+  return { el, setAnim(fn){ anim = fn; }, get text(){ return text; }, get stage(){ return stage; } };
+}
+
+const grid = document.getElementById('grid');
+const cards = [];
+function add(cfg){ const c = card(cfg); grid.appendChild(c.el); cards.push({c, cfg}); return c; }
+
+/* ============================================================
+   1. STAGGER DROP  — letters fall + fade in, elastic settle
+   ============================================================ */
+{
+  const c = add({ name:'01 · Stagger drop', desc:'Letters fall in from above with an elastic settle. Classic hero entrance.' });
+  const letters = c.text.querySelectorAll('.letter');
+  c.setAnim(() => anime({
+    targets: letters,
+    translateY: [{value:[-60,0]}],
+    opacity: [{value:[0,1]}],
+    rotate: [{value:[-12,0]}],
+    easing: 'easeOutElastic(1,.6)',
+    duration: 1100,
+    delay: anime.stagger(45),
+  }));
+}
+
+/* ============================================================
+   2. FLOAT WAVE — continuous gentle sine bob, forever
+   ============================================================ */
+{
+  const c = add({ name:'02 · Float wave', desc:'A slow perpetual wave — the wordmark breathes. Great as a subtle idle state.' });
+  const letters = c.text.querySelectorAll('.letter');
+  c.setAnim(() => anime({
+    targets: letters,
+    translateY: [-8, 8],
+    direction: 'alternate',
+    loop: true,
+    easing: 'easeInOutSine',
+    duration: 1400,
+    delay: anime.stagger(80, {from:'center'}),
+  }));
+}
+
+/* ============================================================
+   3. COLOR SWEEP — a highlight ripples across the letters
+   ============================================================ */
+{
+  const c = add({ name:'03 · Color sweep', desc:'An ice-blue highlight ripples letter-to-letter on a loop.' });
+  const letters = c.text.querySelectorAll('.letter');
+  c.setAnim(() => anime({
+    targets: letters,
+    color: ['#eaf0ff', '#6f9bff'],
+    scale: [1, 1.18, 1],
+    direction: 'alternate',
+    loop: true,
+    easing: 'easeInOutQuad',
+    duration: 700,
+    delay: anime.stagger(90),
+  }));
+}
+
+/* ============================================================
+   4. SVG STROKE DRAW — outline "Blue" draws itself in
+   ============================================================ */
+{
+  const c = add({
+    name:'04 · Stroke draw',
+    desc:'“Blue” rendered as an SVG outline that draws itself — pairs with your existing outlined hero.',
+    build: () => {
+      const wrap = document.createElement('div');
+      wrap.className = 'sb';
+      wrap.innerHTML = `
+        <svg viewBox="0 0 520 150" width="100%" height="120" role="img" aria-label="Something Blue">
+          <text class="draw-path" x="260" y="55" text-anchor="middle"
+                font-family="Fraunces, serif" font-weight="900" font-size="52">Something</text>
+          <text class="draw-path" x="260" y="120" text-anchor="middle"
+                font-family="Fraunces, serif" font-weight="900" font-size="64">Blue</text>
+        </svg>`;
+      return wrap;
+    }
+  });
+  const paths = c.text.querySelectorAll('.draw-path');
+  // give each glyph a dash length; anime's setDashoffset works on paths,
+  // for <text> we fake it with stroke-dasharray sweep via opacity + a mask-free draw.
+  c.setAnim(() => {
+    anime.set(paths, { strokeDasharray: 900, strokeDashoffset: 900, fillOpacity: 0 });
+    anime({
+      targets: paths,
+      strokeDashoffset: [900, 0],
+      easing: 'easeInOutSine',
+      duration: 2000,
+      delay: anime.stagger(400),
+    });
+    anime({
+      targets: paths,
+      fillOpacity: [0, .0],
+      opacity: [.2, 1],
+      duration: 1600,
+      delay: anime.stagger(400),
+      easing: 'linear',
+    });
+  });
+}
+
+/* ============================================================
+   5. SCRAMBLE / DECODE — letters cycle glyphs then lock in
+   ============================================================ */
+{
+  const c = add({ name:'05 · Decode', desc:'Each letter scrambles through random glyphs before locking to the real character.' });
+  const letters = [...c.text.querySelectorAll('.letter')];
+  const finals = letters.map(l => l.textContent);
+  const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&@*<>/';
+  c.setAnim(() => {
+    letters.forEach((l, i) => {
+      let frames = 0;
+      const total = 8 + i * 2;
+      const iv = setInterval(() => {
+        if (frames >= total){ l.textContent = finals[i]; clearInterval(iv); return; }
+        l.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        frames++;
+      }, 45);
+    });
+    anime({ targets: letters, opacity:[.3,1], duration: 900, easing:'linear' });
+  });
+}
+
+/* ============================================================
+   6. GLITCH — RGB split shudder
+   ============================================================ */
+{
+  const c = add({ name:'06 · Glitch', desc:'A quick RGB-split shudder — cyberpunk energy for a poster moment.', extra:'glitch' });
+  const letters = c.text.querySelectorAll('.letter');
+  c.setAnim(() => {
+    const tl = anime.timeline({ easing:'steps(2)' });
+    tl.add({ targets: letters, translateX: () => anime.random(-6,6), skewX: () => anime.random(-8,8), duration: 60, delay: anime.stagger(8) })
+      .add({ targets: letters, translateX: 0, skewX: 0, duration: 90 })
+      .add({ targets: letters, translateX: () => anime.random(-3,3), duration: 50 })
+      .add({ targets: letters, translateX: 0, duration: 120, easing:'easeOutQuad' });
+  });
+}
+
+/* ============================================================
+   7. GRADIENT SHIMMER — light sweeps across a gradient fill
+   ============================================================ */
+{
+  const c = add({ name:'07 · Shimmer', desc:'A specular highlight glides across a gradient text fill. Premium, quiet.', extra:'shimmer' });
+  const inner = c.text.querySelector('.sb-inner');
+  c.setAnim(() => anime({
+    targets: inner,
+    backgroundPositionX: ['200%', '-50%'],
+    duration: 2200,
+    easing: 'easeInOutQuad',
+    loop: true,
+  }));
+}
+
+/* ============================================================
+   8. 3D FLIP — letters flip in on the X axis, perspective
+   ============================================================ */
+{
+  const c = add({ name:'08 · 3D flip', desc:'Letters flip down into place on a perspective axis, like tiles turning.' });
+  c.text.style.perspective = '600px';
+  const letters = c.text.querySelectorAll('.letter');
+  c.setAnim(() => anime({
+    targets: letters,
+    rotateX: [-90, 0],
+    opacity: [0, 1],
+    translateY: [-10, 0],
+    transformOrigin: '50% 0%',
+    easing: 'easeOutBack',
+    duration: 900,
+    delay: anime.stagger(50),
+  }));
+}
+
+/* ============================================================
+   9. MAGNETIC — letters lean toward your cursor
+   ============================================================ */
+{
+  const c = add({ name:'09 · Magnetic', desc:'Move your cursor over the card — letters lean toward it and spring back.' });
+  const letters = [...c.text.querySelectorAll('.letter')];
+  c.setAnim(() => anime({ targets: letters, translateY:[10,0], opacity:[0,1], delay:anime.stagger(30), easing:'easeOutQuad', duration:500 }));
+  c.stage.addEventListener('mousemove', (e) => {
+    const r = c.stage.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    letters.forEach(l => {
+      const lr = l.getBoundingClientRect();
+      const lx = lr.left - r.left + lr.width/2, ly = lr.top - r.top + lr.height/2;
+      const dx = mx - lx, dy = my - ly;
+      const dist = Math.hypot(dx, dy);
+      const pull = Math.max(0, 1 - dist/160);
+      anime({ targets:l, translateX: dx*0.25*pull, translateY: dy*0.25*pull, scale: 1+0.25*pull, duration:300, easing:'easeOutQuad' });
+    });
+  });
+  c.stage.addEventListener('mouseleave', () => {
+    anime({ targets: letters, translateX:0, translateY:0, scale:1, duration:600, easing:'easeOutElastic(1,.5)' });
+  });
+}
+
+/* ---------- kick everything off on load, cascading ---------- */
+window.addEventListener('load', () => {
+  cards.forEach((c, i) => setTimeout(() => c.c.el._run(), 250 + i * 180));
+});
+</script>
+</body>
+</html>
