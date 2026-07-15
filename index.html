@@ -4,17 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Something Blue</title>
-  <meta name="description" content="Something Blue — a band. Recording our first record." />
+  <meta name="description" content="Something Blue — a band. Classic rock and blues. Recording our first record." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Karla:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-
-  <!-- night sky: stars fade in as the page darkens -->
-  <canvas id="field" aria-hidden="true"></canvas>
 
   <header class="nav" id="nav">
     <a class="brand" href="#top">Something Blue</a>
@@ -31,27 +28,74 @@
 
   <main id="main">
 
-    <!-- ══ THE HARBOR ══ identity, live photos, announcements ══ -->
-    <section class="harbor" id="top">
-      <div class="sky" aria-hidden="true"></div>
+    <!-- ══ THE WATERLINE ══ the signature. one drawn line that is
+         both an ocean swell and a waveform. it needs no assets. ══ -->
+    <section class="hero" id="top">
+      <canvas class="sea" id="sea" aria-hidden="true"></canvas>
 
-      <div class="harbor-sky">
+      <div class="hero-sky">
         <h1 class="wordmark">
           <span class="wm-something">Something</span>
           <span class="wm-blue">Blue</span>
         </h1>
       </div>
 
-      <div class="horizon" aria-hidden="true"></div>
+      <!-- ══ NOW ══ a signpost, not a headline. It counts the
+           notices and points down at them; the gallery below owns
+           every one of them, photo and all. Put the notice's words
+           here as well and the page says the same thing twice —
+           that is the exact mistake this replaced.
 
-      <div class="harbor-water">
-        <!-- live photos, lit like harbor lamps. injected by script.js -->
-        <ul class="lamps" id="lamps" aria-label="The band live"></ul>
-
-        <section class="notices" aria-labelledby="noticesHeading">
-          <h2 class="notices-heading" id="noticesHeading">Notices</h2>
-          <ul class="notice-list" id="noticeList"></ul>
+           Structural, too: the hero's grid ends on this block and
+           the drawn waterline is placed by its top edge, so this is
+           what holds the horizon at 79% of the hero. Empty it, or
+           grow it, and the sea moves. Keep its height. -->
+      <div class="hero-water" id="heroWater">
+        <section class="now" aria-labelledby="nowHeading">
+          <h2 class="now-heading" id="nowHeading">Now</h2>
+          <div class="now-body" id="nowBody"></div>
         </section>
+      </div>
+    </section>
+
+    <!-- ══ THE DESCENT ══ everything below the waterline shares one
+         gradient so the page keeps sinking after the canvas stops.
+         Sections are transparent; this wrapper is the water. ══ -->
+    <div class="depths">
+
+    <!-- ══ NOTICES ══ every notice, photo and all. Now, at the
+         waterline, only counts them and points here (no headline),
+         so nothing on this page is said twice. Hidden entirely when
+         there are none. ══ -->
+    <section class="band-section notices-section" id="notices" hidden>
+      <div class="inner">
+        <div class="head notices-head">
+          <div>
+            <p class="eyebrow" id="noticesCount"></p>
+            <h2 class="title">Notices</h2>
+          </div>
+          <div class="gallery-nav" id="galleryNav" hidden>
+            <button class="gallery-btn" id="galleryPrev" type="button" aria-label="Previous notice">&larr;</button>
+            <button class="gallery-btn" id="galleryNext" type="button" aria-label="Next notice">&rarr;</button>
+          </div>
+        </div>
+
+        <div class="gallery" id="gallery">
+          <ul class="gallery-track" id="galleryTrack"></ul>
+        </div>
+
+        <ol class="gallery-dots" id="galleryDots" hidden></ol>
+      </div>
+    </section>
+
+    <!-- ══ LIVE ══ only renders once real photos exist ══ -->
+    <section class="band-section live-section" id="liveSection" hidden>
+      <div class="inner">
+        <div class="head">
+          <p class="eyebrow">On stage</p>
+          <h2 class="title">Live</h2>
+        </div>
+        <ul class="live-strip" id="liveStrip" aria-label="Something Blue live"></ul>
       </div>
     </section>
 
@@ -77,25 +121,8 @@
         <div class="record-grid">
           <p class="lead">We're recording our first record now.</p>
           <div class="record-detail">
-            <p class="tk-block">
-              <span class="tk">TK</span> What it sounds like, where you're tracking it,
-              and who's making it with you. A paragraph in your own words — this is the
-              most interesting thing about the band right now, so it's worth writing well.
-            </p>
-            <dl class="record-facts">
-              <div class="fact">
-                <dt>Title</dt>
-                <dd><span class="tk">TK</span></dd>
-              </div>
-              <div class="fact">
-                <dt>Studio</dt>
-                <dd><span class="tk">TK</span></dd>
-              </div>
-              <div class="fact">
-                <dt>Out</dt>
-                <dd><span class="tk">TK</span></dd>
-              </div>
-            </dl>
+            <div id="recordBlurb"></div>
+            <dl class="record-facts" id="recordFacts"></dl>
             <p class="record-cta">
               The songs land here when they're done.
               <a href="#stay">Join the list</a> and you'll hear them first.
@@ -109,22 +136,12 @@
     <section class="band-section" id="band">
       <div class="inner">
         <div class="head">
-          <p class="eyebrow"><span class="tk">TK</span> Together since</p>
+          <p class="eyebrow" id="bandSince"></p>
           <h2 class="title">The band</h2>
         </div>
 
-        <div class="band-grid">
-          <p class="lead tk-block">
-            <span class="tk">TK</span> How the band started, and what you're going for.
-            Two or three sentences. Say the specific thing, not the impressive thing.
-          </p>
-          <p class="body-text tk-block">
-            <span class="tk">TK</span> A second paragraph if you want one — where you play,
-            what you sound like, what you're chasing.
-          </p>
-        </div>
+        <div class="band-grid" id="bandBio"></div>
 
-        <!-- roster, injected by script.js -->
         <ul class="members" id="members"></ul>
       </div>
     </section>
@@ -140,18 +157,17 @@
           <button type="submit" class="btn">Join the list</button>
         </form>
         <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
+        <div id="formNote"></div>
       </div>
     </section>
+
+    </div><!-- /.depths -->
 
   </main>
 
   <footer class="footer">
     <span class="footer-brand">Something Blue</span>
-    <nav class="footer-links" aria-label="Elsewhere">
-      <a href="#"><span class="tk">TK</span> Instagram</a>
-      <a href="#"><span class="tk">TK</span> Bandcamp</a>
-      <a href="#"><span class="tk">TK</span> Booking</a>
-    </nav>
+    <nav class="footer-links" id="footerLinks" aria-label="Elsewhere"></nav>
     <small>© <span id="year"></span> Something Blue</small>
   </footer>
 

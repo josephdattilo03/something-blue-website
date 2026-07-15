@@ -1,37 +1,90 @@
 /* ============================================================
    Something Blue
    ------------------------------------------------------------
-   Direction: blue hour — the twilight window after sunset.
-   The page is one scene: a dark sky, a glowing horizon, and a
-   harbor lit below it. Scrolling carries you from dusk into
-   full night. The palette is monochrome blue on purpose; the
-   only warm light is sodium, and it only ever appears as an
-   actual light source in the scene, never in the interface.
+   Direction: THE WATERLINE.
 
-   The one exception: TK markers are sodium so unfinished
-   content is impossible to miss. They disappear with the
-   scaffolding, and the rule holds for the finished site.
+   The name means three things at once — the color, the ocean,
+   and blues the music. One mark carries all three: a single
+   drawn line that is simultaneously an ocean swell and an
+   audio waveform. They are the same shape. It is the page's
+   only signature and its only motion.
+
+   Rules, learned the hard way:
+
+   1. THE SCENE IS DRAWN, NOT NAMED. The previous build called
+      things .harbor and .lamps and rendered a gradient with a
+      line through it. Class names are not design. If the water
+      is meant to be there, it has to be on the canvas.
+
+   2. NO ASSET DEPENDENCIES. The previous build outsourced all
+      its warmth to live photos that don't exist, so it shipped
+      cold and empty. This page must look finished with zero
+      images. Photos improve it; nothing waits on them.
+
+   3. WARM LIGHT IS A LIGHT SOURCE, NEVER INTERFACE. The sun
+      and its reflection are warm because a setting sun is warm.
+      No amber buttons, no amber borders. Classic rock and blues
+      want analog warmth — it comes from the sun, not the UI.
+
+   4. --sea and --sun are ATMOSPHERE. Contrast is checked below,
+      not eyeballed. A tonal palette is the whole point of this
+      direction and also exactly where contrast quietly breaks.
    ============================================================ */
 
 :root {
-  /* blue hour, dark to light */
-  --abyss:   #080D19;  /* deepest night — page floor */
-  --water:   #0D1425;  /* below the horizon */
-  --zenith:  #131F3C;  /* top of the sky */
-  --indigo:  #1E2E52;  /* the indigo hour itself */
-  --dusk:    #4A6A96;  /* atmosphere only — 3.5:1, fails AA as text */
-  --sky:     #A8BFD8;  /* last light at the horizon */
-  --foam:    #DCE6F0;  /* primary text — 15.4:1 on --abyss */
-  --haze:    #8FA6C4;  /* secondary text — 7.8:1 */
-  --label:   #7A90B4;  /* the quietest text allowed — 6.0:1 */
-  --sodium:  #E9A15B;  /* harbor lamp. atmosphere only. */
+  /* ── THE DESCENT ── grounds, never text ───────────────────
+     One body of water, surface to floor. The canvas paints the
+     hero and hands off at --depth-0; .depths picks the ramp up
+     from exactly there and carries it to the floor. script.js
+     reads --surface and --depth-0 from here so the handoff can
+     never drift out of sync — edit them in one place only.
 
-  --hairline: rgba(168, 191, 216, .16);
-  --hairline-lit: rgba(168, 191, 216, .38);
+     --depth-0 is not a taste decision, it is a ceiling. The sun's
+     glitter is additive warm light, so it only reads warm while
+     the water's own blue stays low enough: over #10293A it lands
+     at R-B +13 (warm), over #163A4F at -2 (dead grey). Any
+     brighter here and rule 3 breaks — the sun goes colorless and
+     the page loses the only warm thing on it. Don't raise it. */
+  --surface: #1B3F56;  /* the water at the waterline */
+  --depth-0: #10293A;  /* hero bottom = page top. the warmth ceiling. */
+  --depth-1: #0C1F2C;
+  --depth-2: #091620;
+  --deep:    #060F16;  /* the floor */
 
-  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --body: "Newsreader", Georgia, "Times New Roman", serif;
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --water:  #0B1A24;  /* frames (photos), not ground */
+  --swell:  #143247;  /* mid water */
+  --sea:    #2E5F7D;  /* ATMOSPHERE ONLY — fails AA as text */
+
+  /* ── text ──────────────────────────────────────────────────
+     Ratios are vs --surface (#1B3F56) — the LIGHTEST ground any
+     of these ever sits on, not --deep. Measuring against the
+     floor is what hid the last bug: --label read 6.3:1 against
+     --deep while actually sitting on the water at 3.6:1, and
+     shipped failing. The floor is the friendliest ground on the
+     page and therefore the most useless one to check. Now that
+     the ground is a ramp, check the top of it. */
+  --foam:   #E9F0F3;  /* primary text — 9.6:1 */
+  --haze:   #ADC2CE;  /* secondary text — 6.0:1 */
+  --label:  #93A9B7;  /* the quietest text allowed — 4.6:1 */
+  --sun:    #E2894A;  /* the one warm light. atmosphere only. */
+
+  --hairline: rgba(157, 180, 194, .15);
+  --hairline-lit: rgba(157, 180, 194, .34);
+
+  /* the nav is a pane of deep water, not a black bar. It has to
+     stay a real scrim — the wordmark passes under it at full size
+     and would eat the links otherwise — so it can't just go
+     translucent. --depth-1 tint keeps it in the sea: 5.8:1 for
+     links at its worst, which is over the wordmark itself. */
+  --nav-glass: rgba(16, 41, 58, .88);        /* --depth-1 */
+  --nav-glass-solid: rgba(16, 41, 58, .96);  /* the mobile panel */
+
+  /* Fraunces: an old-style with soft, slightly wonky bones —
+     a 70s record sleeve, not a software brand. Used with
+     restraint: the wordmark and section titles, nothing else.
+     Karla does all the work. */
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Karla", "Helvetica Neue", Arial, sans-serif;
 
   --maxw: 1080px;
   --pad: clamp(1.25rem, 5vw, 4rem);
@@ -42,21 +95,21 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--abyss);
+  background: var(--deep);
   color: var(--foam);
   font-family: var(--body);
   font-optical-sizing: auto;
-  line-height: 1.6;
+  line-height: 1.65;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 a { color: inherit; text-decoration: none; }
 
-::selection { background: var(--dusk); color: var(--foam); }
+::selection { background: var(--swell); color: var(--foam); }
 
 :focus-visible {
-  outline: 2px solid var(--sky);
+  outline: 2px solid var(--haze);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -75,46 +128,39 @@ a { color: inherit; text-decoration: none; }
   top: -100px; left: var(--pad);
   z-index: 60;
   background: var(--foam);
-  color: var(--water);
-  font-family: var(--mono);
+  color: var(--deep);
   font-size: .8rem;
+  font-weight: 600;
   padding: .7rem 1rem;
   transition: top .2s;
 }
 .skip:focus { top: 1rem; }
 
-/* stars — fade in once the page reaches full night ---------- */
-#field {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.nav, main, .footer { position: relative; z-index: 1; }
-
 /* ── TK scaffolding ─────────────────────────────────────────
-   Nothing here is real content. Delete these as you fill in.
+   Nothing here is real content. "TK" is a newsroom mark for
+   "to come". It's loud on purpose: unfinished content cannot
+   ship by accident. Delete these as you fill them in.
+   The sodium-is-atmosphere rule doesn't apply to scaffolding,
+   because scaffolding gets removed.
    ───────────────────────────────────────────────────────── */
 .tk {
-  font-family: var(--mono);
-  font-size: .6em;
-  font-weight: 600;
+  font-family: var(--body);
+  font-size: .62em;
+  font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: #2A1A08;
-  background: var(--sodium);
-  padding: .2em .45em;
+  color: #2A1707;
+  background: var(--sun);
+  padding: .25em .5em;
   border-radius: 2px;
   margin-right: .55em;
   white-space: nowrap;
-  vertical-align: .1em;
+  vertical-align: .12em;
 }
 .tk-block {
-  border: 1px dashed rgba(233, 161, 91, .38);
+  border: 1px dashed rgba(226, 137, 74, .38);
   border-radius: 3px;
-  background: rgba(233, 161, 91, .04);
+  background: rgba(226, 137, 74, .04);
   padding: 1.1rem 1.2rem;
 }
 
@@ -131,16 +177,21 @@ a { color: inherit; text-decoration: none; }
   transition: background .35s ease, backdrop-filter .35s ease, border-color .35s ease;
   border-bottom: 1px solid transparent;
 }
+/* The tint here is only the no-JS fallback — script.js samples the
+   depth ramp on scroll and overrides backgroundColor inline, so the
+   bar wears the exact colour of the water it is floating on. No
+   hairline: a rule under a bar that matches its ground is just a
+   line drawn across the gradient. */
 .nav.scrolled {
-  background: rgba(8, 13, 25, .8);
+  background: var(--nav-glass);
   backdrop-filter: blur(12px);
-  border-bottom-color: var(--hairline);
+  border-bottom-color: transparent;
 }
 .brand {
   font-family: var(--display);
-  font-variation-settings: 'wdth' 118, 'wght' 700;
-  font-size: .95rem;
-  letter-spacing: .02em;
+  font-variation-settings: 'opsz' 14, 'wght' 600, 'SOFT' 40, 'WONK' 1;
+  font-size: 1.05rem;
+  letter-spacing: .01em;
   color: var(--foam);
 }
 .nav-links {
@@ -149,9 +200,10 @@ a { color: inherit; text-decoration: none; }
   gap: 2rem;
 }
 .nav-links a {
-  font-family: var(--mono);
-  font-size: .78rem;
-  letter-spacing: .1em;
+  font-size: .8rem;
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
   color: var(--haze);
   transition: color .2s;
 }
@@ -163,7 +215,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--foam);
   transition: background .25s, border-color .25s;
 }
-.nav-cta:hover { background: rgba(168, 191, 216, .1); border-color: var(--sky); }
+.nav-cta:hover { background: rgba(157, 180, 194, .1); border-color: var(--haze); }
 
 .nav-toggle {
   display: none;
@@ -183,36 +235,34 @@ a { color: inherit; text-decoration: none; }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-/* ══ THE HARBOR ══════════════════════════════════════════════
-   sky (wordmark) / horizon (the line) / water (lamps, notices)
+/* ══ THE HERO ════════════════════════════════════════════════
+   sky (wordmark) above the waterline, water (notices) below.
+   The canvas draws the whole scene: sky, sun, swell, glitter.
+   script.js reads .hero-water's offset to place the waterline,
+   so the drawn line lands exactly where the layout turns over.
    ══════════════════════════════════════════════════════════ */
-.harbor {
+.hero {
   position: relative;
   min-height: 100svh;
   display: grid;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: 1fr auto;
   padding: 6rem var(--pad) clamp(1.5rem, 4vw, 2.5rem);
   overflow: hidden;
 }
 
-/* the scene's light: dark zenith, indigo, then night below */
-.sky {
+.sea {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(180deg,
-    #0C1428  0%,
-    var(--zenith) 26%,
-    var(--indigo) 54%,
-    #1B2B4B 62%,
-    var(--water) 72%,
-    var(--abyss) 100%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.harbor-sky,
-.harbor-water { position: relative; z-index: 2; }
+.hero-sky,
+.hero-water { position: relative; z-index: 2; }
 
-.harbor-sky {
+.hero-sky {
   display: flex;
   align-items: flex-end;
   width: 100%;
@@ -221,319 +271,382 @@ a { color: inherit; text-decoration: none; }
   padding-bottom: clamp(1.5rem, 4vw, 3rem);
 }
 
-/* the wordmark: a quiet "Something" over a wide, heavy "Blue" */
-.wordmark { display: grid; gap: clamp(.4rem, 1vw, .9rem); }
+/* the wordmark: a quiet, tracked "Something" over a heavy
+   "Blue" that sits on the water, backlit by the sun */
+.wordmark { display: grid; gap: clamp(.5rem, 1.2vw, 1rem); }
 .wm-something {
-  font-family: var(--display);
-  font-variation-settings: 'wdth' 125, 'wght' 500;
-  font-size: clamp(.7rem, 1.7vw, 1.15rem);
-  letter-spacing: .46em;
-  text-indent: .46em;
+  font-family: var(--body);
+  font-size: clamp(.7rem, 1.7vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: .48em;
+  text-indent: .48em;
   text-transform: uppercase;
-  color: var(--sky);
+  color: var(--haze);
 }
 .wm-blue {
   font-family: var(--display);
-  font-variation-settings: 'wdth' 125, 'wght' 900;
-  font-size: clamp(5rem, 23vw, 17rem);
-  line-height: .76;
-  letter-spacing: -.05em;
+  font-variation-settings: 'opsz' 144, 'wght' 900, 'SOFT' 60, 'WONK' 1;
+  font-size: clamp(4.5rem, 21vw, 15rem);
+  line-height: .8;
+  letter-spacing: -.03em;
   color: var(--foam);
 }
-/* anime.js splits this into per-char spans on load */
-.wm-blue .char,
-.wm-something .char { display: inline-block; will-change: transform, opacity; }
+.wm-blue .char { display: inline-block; will-change: transform, opacity; }
 
-/* ── THE HORIZON ── the signature. it lights the page. ────── */
-.horizon {
-  position: relative;
-  z-index: 1;
-  height: 1px;
-  /* a horizon runs to the edges of the world, not to the grid */
-  margin-inline: calc(var(--pad) * -1);
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--hairline-lit) 12%,
-    var(--sky) 50%,
-    var(--hairline-lit) 88%,
-    transparent 100%);
-  transform-origin: center;
-}
-/* last light, blooming off the line. this is what lights the
-   page — the wordmark sits in front of it, backlit. */
-.horizon::before {
-  content: "";
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 150%;
-  height: min(62vh, 520px);
-  background: radial-gradient(ellipse 44% 50% at 50% 50%,
-    rgba(178, 203, 232, .58) 0%,
-    rgba(140, 174, 216, .30) 26%,
-    rgba(96, 132, 184, .13) 48%,
-    transparent 74%);
-  pointer-events: none;
-}
-/* a tighter, hotter band right on the waterline */
-.horizon::after {
-  content: "";
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 96%;
-  height: 90px;
-  background: radial-gradient(ellipse 42% 50% at 50% 50%,
-    rgba(214, 232, 250, .5) 0%,
-    transparent 70%);
-  pointer-events: none;
-}
-
-/* ── THE WATER ── harbor lamps + the notice board ─────────── */
-.harbor-water {
+/* ── THE WATER ── the notice board sits just under the line ── */
+.hero-water {
   width: 100%;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding-top: clamp(1.25rem, 3vw, 2rem);
-  display: grid;
-  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  padding-top: clamp(1.75rem, 4vw, 2.75rem);
 }
 
-/* live photos, lit like lamps along the waterfront */
-.lamps {
+/* ── NOW ── the signpost at the waterline ────────────────────
+   A count and an arrow, pointing at the gallery. It carries no
+   news on purpose: the gallery owns every notice and its photo,
+   and repeating the headline here is exactly the redundancy this
+   replaced. Sized to hold the water strip at the height the hero
+   was composed around — see the note in index.html. */
+.now-heading {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--label);
+  margin-bottom: .9rem;
+}
+.now-body {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .5rem 1.25rem;
+  padding: .8rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.signpost {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .6rem;
+  font-size: .98rem;
+  color: var(--foam);
+  transition: gap .25s ease;
+}
+.signpost:hover { gap: .95rem; }
+.signpost-count {
+  border-bottom: 1px solid var(--hairline-lit);
+  padding-bottom: 1px;
+  transition: border-color .2s;
+}
+.signpost:hover .signpost-count { border-color: var(--foam); }
+.signpost-arrow { color: var(--haze); }
+
+.notice-empty {
+  padding: .8rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--haze);
+  font-size: .92rem;
+}
+.notice-empty code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .85em;
+  color: var(--foam);
+}
+
+/* ══ THE DESCENT ═════════════════════════════════════════════
+   Below the waterline the page keeps sinking. The light falls
+   off as you go down, exactly as it does on the canvas above —
+   the hero and the page are one body of water, and this is the
+   half that used to be missing. The sections used to be flat
+   --deep with a rule between each, which is the stacked-box
+   reading this direction exists to avoid.
+
+   One gradient on one container, not a background per section.
+   Sections stay transparent, so nothing can seam at a boundary,
+   and Live can appear or vanish without breaking the ramp. The
+   gradient deliberately does NOT align to section edges: the
+   water doesn't know where the boxes are.
+
+   Depth is the separator. That is why there are no rules here.
+   ══════════════════════════════════════════════════════════ */
+.depths {
+  background: linear-gradient(
+    180deg,
+    var(--depth-0) 0%,
+    var(--depth-1) 38%,
+    var(--depth-2) 72%,
+    var(--deep) 100%
+  );
+}
+
+.band-section {
+  position: relative;
+  padding: clamp(4.5rem, 11vw, 8.5rem) var(--pad);
+  background: transparent;
+}
+
+.inner { width: 100%; max-width: var(--maxw); margin: 0 auto; }
+
+.head { margin-bottom: clamp(2rem, 4vw, 3rem); }
+.eyebrow {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--label);
+  margin-bottom: .7rem;
+}
+.title {
+  font-family: var(--display);
+  font-variation-settings: 'opsz' 72, 'wght' 700, 'SOFT' 50, 'WONK' 1;
+  font-size: clamp(2.1rem, 5.5vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  color: var(--foam);
+}
+.lead {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.5;
+  color: var(--foam);
+}
+.body-text { color: var(--haze); }
+
+/* ══ THE NOTICE GALLERY ═══════════════════════════════════════
+   A scroll-snap track, not a transform carousel: the browser
+   already does momentum, swipe, snapping and keyboard scrolling
+   properly, and doing it by hand only means doing it worse. The
+   arrows and dots drive scrollLeft; native swipe drives the same
+   state back. One source of truth, and it degrades to a plain
+   horizontally scrollable list with no JS at all.
+   ══════════════════════════════════════════════════════════ */
+.notices-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.gallery-nav { display: flex; gap: .5rem; }
+.gallery-btn {
+  width: 2.75rem; height: 2.75rem;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 1px solid var(--hairline-lit);
+  border-radius: 2px;
+  color: var(--foam);
+  font-family: var(--body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, opacity .25s;
+}
+.gallery-btn:hover:not(:disabled) { background: rgba(157, 180, 194, .1); border-color: var(--haze); }
+.gallery-btn:disabled { opacity: .3; cursor: default; }
+
+.gallery {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* the track is the only thing on the page allowed to scroll
+     sideways; the page itself never does */
+  overscroll-behavior-x: contain;
+}
+.gallery::-webkit-scrollbar { display: none; }
+
+.gallery-track {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: clamp(.45rem, 1.1vw, .9rem);
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: clamp(1rem, 3vw, 2rem);
 }
-.lamp {
+
+.notice-card {
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 3rem);
+}
+/* a card with no picture is not a card with a hole in it */
+.notice-card.no-image { grid-template-columns: minmax(0, 1fr); }
+
+.notice-figure {
+  margin: 0;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--water);
+  border: 1px solid var(--hairline);
+}
+.notice-figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.notice-body { display: grid; gap: .9rem; justify-items: start; }
+.notice-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.notice-card .notice-date {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+.notice-card .notice-kind {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--haze);
+}
+.notice-headline {
+  font-family: var(--display);
+  font-variation-settings: 'opsz' 48, 'wght' 600, 'SOFT' 50, 'WONK' 1;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  color: var(--foam);
+  text-wrap: balance;
+}
+.notice-card .notice-cta {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--haze);
+  border-bottom: 1px solid var(--hairline-lit);
+  padding-bottom: 1px;
+  transition: color .2s, border-color .2s;
+}
+.notice-card .notice-cta:hover { color: var(--foam); border-color: var(--foam); }
+
+.gallery-dots {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  margin-top: clamp(1.25rem, 3vw, 1.75rem);
+}
+/* The mark is a 2px rule, but the button is not: a 2px-tall hit
+   target is unusable with a finger and misses WCAG 2.5.8's 24px
+   minimum. The bar is drawn by ::after so the control can be big
+   while the design stays thin. */
+.gallery-dot {
+  width: 2.25rem;
+  height: 24px;
+  display: grid;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.gallery-dot::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: var(--hairline-lit);
+  transition: background .3s;
+}
+.gallery-dot[aria-current="true"]::after { background: var(--foam); }
+.gallery-dot:hover::after { background: var(--haze); }
+
+@media (max-width: 720px) {
+  .notice-card { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── live strip ── only rendered when real photos exist ───── */
+.live-strip {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(.5rem, 1.2vw, 1rem);
+}
+.live-shot {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 2px;
-  background: linear-gradient(180deg, #16233D 0%, #0A1020 70%);
-  border: 1px solid rgba(168, 191, 216, .1);
-  transition: transform .4s cubic-bezier(.2, .7, .2, 1), border-color .4s;
+  background: var(--water);
+  border: 1px solid var(--hairline);
 }
-.lamp:hover { transform: translateY(-3px); border-color: var(--hairline-lit); }
-.lamp img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
-/* No photo yet: the lamp is still lit. This is an empty state,
-   not a placeholder — a dark waterfront with the lights on is
-   true, so it ships. A lamp is a hot core plus a bloom; a soft
-   wash just reads as mud. */
-/* Empty, a frame stays quiet. Every attempt to fake stage light
-   here read as a blob, and — worse — five invented glows compete
-   with the horizon, which is the one thing meant to carry light.
-   Your photos bring the warm light themselves; until then this
-   waits, and says so. */
-.lamp-empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--mono);
-  font-size: .56rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--label);
-}
-.lamp-caption {
+.live-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.live-caption {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  padding: 1.4rem .55rem .45rem;
-  font-family: var(--mono);
-  font-size: .58rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--foam);
-  background: linear-gradient(180deg, transparent, rgba(8, 13, 25, .85));
-}
-
-/* the notice board — what you removed as a marquee, rebuilt as
-   a dated list. newest first. it can be empty and still read. */
-.notices { display: grid; gap: .2rem; }
-.notices-heading {
-  font-family: var(--mono);
-  font-size: .68rem;
-  font-weight: 500;
-  letter-spacing: .24em;
-  text-transform: uppercase;
-  color: var(--label);
-  margin-bottom: .5rem;
-}
-.notice-list { list-style: none; }
-.notice {
-  display: grid;
-  grid-template-columns: 6.5rem 6rem 1fr auto;
-  align-items: baseline;
-  gap: 1.25rem;
-  padding: .8rem .25rem;
-  border-top: 1px solid var(--hairline);
-  transition: background .25s;
-}
-.notice:last-child { border-bottom: 1px solid var(--hairline); }
-.notice:hover { background: rgba(168, 191, 216, .04); }
-.notice-date,
-.notice-kind {
-  font-family: var(--mono);
+  padding: 1.5rem .7rem .55rem;
+  background: linear-gradient(180deg, transparent, rgba(6, 15, 22, .85));
   font-size: .72rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.notice-date { color: var(--label); }
-.notice-kind { color: var(--sky); }
-.notice-text {
-  font-family: var(--body);
-  font-size: 1rem;
+  letter-spacing: .04em;
   color: var(--foam);
 }
-.notice-cta {
-  font-family: var(--mono);
-  font-size: .72rem;
-  letter-spacing: .08em;
-  color: var(--haze);
-  white-space: nowrap;
-  border-bottom: 1px solid transparent;
-  transition: color .2s, border-color .2s;
-}
-.notice-cta:hover { color: var(--foam); border-bottom-color: var(--sky); }
-.notice-empty {
-  border: 1px dashed rgba(233, 161, 91, .38);
-  border-radius: 3px;
-  background: rgba(233, 161, 91, .04);
-  padding: .9rem 1.1rem;
-  font-family: var(--body);
-  color: var(--haze);
-}
 
-/* ══ SECTIONS ═══════════════════════════════════════════════
-   one padding rule for every section. don't override it.
-   ═════════════════════════════════════════════════════════ */
-.band-section { padding: clamp(5rem, 12vw, 9rem) var(--pad); }
-.inner { width: 100%; max-width: var(--maxw); margin: 0 auto; }
-
-.head { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
-.eyebrow {
-  font-family: var(--mono);
-  font-size: .72rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--haze);
-  margin-bottom: .8rem;
-}
-.title {
-  font-family: var(--display);
-  font-variation-settings: 'wdth' 118, 'wght' 800;
-  font-size: clamp(2rem, 5.5vw, 3.6rem);
-  letter-spacing: -.035em;
-  line-height: 1;
-  color: var(--foam);
-}
-.lead {
-  font-family: var(--body);
-  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
-  font-weight: 300;
-  line-height: 1.42;
-  color: var(--foam);
-}
-.body-text {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--haze);
-}
-
-/* ── SHOWS ── a schedule is tabular data, so it's a table ─── */
+/* ── shows ───────────────────────────────────────────────── */
 .show-list { list-style: none; }
 .show {
   display: grid;
   grid-template-columns: 7rem 1fr auto;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.3rem .25rem;
+  padding: 1.35rem 0;
   border-top: 1px solid var(--hairline);
-  transition: background .25s, padding-left .25s;
 }
 .show:last-child { border-bottom: 1px solid var(--hairline); }
-.show:hover { background: rgba(168, 191, 216, .04); padding-left: .9rem; }
 .show-date {
-  font-family: var(--mono);
-  font-size: .84rem;
-  letter-spacing: .06em;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--sky);
+  color: var(--haze);
+  font-variant-numeric: tabular-nums;
 }
+.show-where { display: grid; gap: .15rem; }
 .show-city {
   font-family: var(--display);
-  font-variation-settings: 'wdth' 112, 'wght' 600;
-  font-size: 1.1rem;
+  font-variation-settings: 'opsz' 24, 'wght' 600, 'SOFT' 50, 'WONK' 0;
+  font-size: 1.25rem;
   color: var(--foam);
 }
-.show-venue {
-  font-family: var(--body);
-  font-size: .95rem;
-  color: var(--haze);
-}
+.show-venue { font-size: .85rem; color: var(--label); }
 .show-cta {
-  font-family: var(--mono);
-  font-size: .74rem;
+  font-size: .78rem;
+  font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--foam);
   border: 1px solid var(--hairline-lit);
   border-radius: 2px;
-  padding: .5rem .95rem;
-  white-space: nowrap;
+  padding: .55rem 1rem;
   transition: background .25s, border-color .25s;
 }
-.show-cta:hover { background: rgba(168, 191, 216, .1); border-color: var(--sky); }
+.show-cta:hover { background: rgba(157, 180, 194, .1); border-color: var(--haze); }
 .show-sold {
-  font-family: var(--mono);
-  font-size: .74rem;
+  font-size: .78rem;
+  font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--label);
-  padding: .5rem 0;
-  white-space: nowrap;
 }
-
-/* no dates yet is a real state for a band making a record.
-   it's an invitation, not an apology. */
-.shows-empty {
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
-  padding: clamp(2.5rem, 6vw, 4rem) 0;
-  display: grid;
-  gap: 1rem;
-  justify-items: start;
-}
-.shows-empty p {
-  font-family: var(--body);
-  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
-  font-weight: 300;
-  color: var(--foam);
-  max-width: 34ch;
-}
+.shows-empty { display: grid; gap: 1rem; justify-items: start; }
+.shows-empty p { font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--foam); }
 .shows-empty a {
-  font-family: var(--mono);
-  font-size: .76rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--sky);
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--haze);
   border-bottom: 1px solid var(--hairline-lit);
-  padding-bottom: .2rem;
+  padding-bottom: 2px;
   transition: color .2s, border-color .2s;
 }
-.shows-empty a:hover { color: var(--foam); border-bottom-color: var(--sky); }
+.shows-empty a:hover { color: var(--foam); border-color: var(--foam); }
 
-/* ── THE RECORD ─────────────────────────────────────────── */
+/* ── the record ──────────────────────────────────────────── */
 .record-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.15fr;
   gap: clamp(2rem, 5vw, 4rem);
   align-items: start;
 }
@@ -543,245 +656,196 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: 6rem 1fr;
   gap: 1rem;
+  align-items: baseline;
   padding: .8rem 0;
   border-top: 1px solid var(--hairline);
 }
 .fact:last-child { border-bottom: 1px solid var(--hairline); }
 .fact dt {
-  font-family: var(--mono);
-  font-size: .72rem;
-  letter-spacing: .14em;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--label);
 }
-.fact dd { font-family: var(--body); color: var(--foam); }
-.record-cta {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--haze);
-}
+.fact dd { color: var(--foam); }
+.record-cta { font-size: .95rem; color: var(--haze); }
 .record-cta a {
-  color: var(--sky);
+  color: var(--foam);
   border-bottom: 1px solid var(--hairline-lit);
-  transition: color .2s, border-color .2s;
+  transition: border-color .2s;
 }
-.record-cta a:hover { color: var(--foam); border-bottom-color: var(--sky); }
+.record-cta a:hover { border-color: var(--foam); }
 
-/* ── THE BAND ───────────────────────────────────────────── */
+/* ── the band ────────────────────────────────────────────── */
 .band-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
   align-items: start;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 .members {
   list-style: none;
-  margin-top: clamp(2.5rem, 6vw, 4rem);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1rem, 2.5vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
 }
 .member { display: grid; gap: .9rem; }
 .member-photo {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 2px;
-  background: linear-gradient(170deg, #1B2B4B, #0B1120);
+  background: var(--water);
   border: 1px solid var(--hairline);
 }
-.member-photo img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
+.member-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .member-photo-empty {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  font-family: var(--mono);
-  font-size: .62rem;
+  font-size: .6rem;
+  font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--label);
 }
 .member-name {
+  display: block;
   font-family: var(--display);
-  font-variation-settings: 'wdth' 112, 'wght' 600;
-  font-size: 1.05rem;
+  font-variation-settings: 'opsz' 24, 'wght' 600, 'SOFT' 50, 'WONK' 0;
+  font-size: 1.1rem;
   color: var(--foam);
-  line-height: 1.2;
 }
 .member-role {
   display: block;
-  margin-top: .3rem;
-  font-family: var(--mono);
-  font-size: .68rem;
-  letter-spacing: .14em;
+  font-size: .78rem;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--haze);
+  color: var(--label);
 }
 
-/* ── STAY CLOSE ─────────────────────────────────────────── */
-.stay-inner {
-  max-width: 560px;
-  display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: 1rem;
-}
-.stay-title { font-size: clamp(2rem, 5vw, 3.2rem); }
-.stay-sub {
-  font-family: var(--body);
-  font-size: 1.1rem;
-  color: var(--haze);
-  max-width: 38ch;
-}
+/* ── stay close ──────────────────────────────────────────── */
+.stay-inner { display: grid; gap: 1.1rem; justify-items: start; }
+.stay-title { font-size: clamp(2.4rem, 7vw, 4.5rem); }
+.stay-sub { color: var(--haze); max-width: 34ch; }
 .signup {
   display: flex;
-  gap: .5rem;
+  gap: .6rem;
   width: 100%;
-  max-width: 420px;
-  margin-top: 1rem;
+  max-width: 30rem;
+  margin-top: .6rem;
+  flex-wrap: wrap;
 }
 .signup input {
-  flex: 1;
-  min-width: 0;
-  background: rgba(8, 13, 25, .6);
+  flex: 1 1 14rem;
+  background: rgba(157, 180, 194, .06);
   border: 1px solid var(--hairline-lit);
   border-radius: 2px;
   padding: .85rem 1rem;
   color: var(--foam);
-  font-family: var(--mono);
-  font-size: .85rem;
-  transition: border-color .25s, box-shadow .25s;
+  font-family: var(--body);
+  font-size: .95rem;
 }
 .signup input::placeholder { color: var(--label); }
-.signup input:focus {
-  outline: none;
-  border-color: var(--sky);
-  box-shadow: 0 0 0 3px rgba(168, 191, 216, .14);
-}
+.signup input:focus { border-color: var(--haze); outline: none; }
+.signup input:focus-visible { outline: 2px solid var(--haze); outline-offset: 2px; }
 .btn {
-  font-family: var(--mono);
-  font-size: .78rem;
-  font-weight: 500;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--water);
   background: var(--foam);
+  color: var(--deep);
   border: 1px solid var(--foam);
   border-radius: 2px;
-  padding: .85rem 1.3rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background .25s, border-color .25s;
-}
-.btn:hover { background: var(--sky); border-color: var(--sky); }
-.form-msg {
-  font-family: var(--mono);
+  padding: .85rem 1.5rem;
+  font-family: var(--body);
   font-size: .78rem;
-  color: var(--sky);
-  min-height: 1.3em;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
 }
-.form-msg.error { color: var(--sodium); }
+.btn:hover { background: var(--haze); border-color: var(--haze); }
+.form-msg { font-size: .88rem; color: var(--haze); min-height: 1.3em; }
+.form-msg.error { color: #F2A6A6; }
+.form-note {
+  font-size: .82rem;
+  color: var(--haze);
+  max-width: 46ch;
+  border: 1px dashed rgba(226, 137, 74, .38);
+  border-radius: 3px;
+  background: rgba(226, 137, 74, .04);
+  padding: .8rem .9rem;
+}
 
-/* ── FOOTER ─────────────────────────────────────────────── */
+/* ── footer ──────────────────────────────────────────────── */
+/* the floor. the ramp above ends on exactly this color, so there
+   is no rule here either — you simply run out of water. */
 .footer {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 2.5rem var(--pad) 3.5rem;
-  border-top: 1px solid var(--hairline);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1.25rem;
+  gap: 1rem;
+  padding: 2.5rem var(--pad);
+  background: var(--deep);
 }
 .footer-brand {
   font-family: var(--display);
-  font-variation-settings: 'wdth' 118, 'wght' 700;
-  font-size: .95rem;
+  font-variation-settings: 'opsz' 14, 'wght' 600, 'SOFT' 40, 'WONK' 1;
+  font-size: 1rem;
+  color: var(--foam);
 }
-.footer-links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
-.footer-links a,
-.footer small {
-  font-family: var(--mono);
-  font-size: .74rem;
+.footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.footer-links a {
+  font-size: .78rem;
   letter-spacing: .06em;
   color: var(--haze);
+  transition: color .2s;
 }
-.footer-links a { transition: color .2s; }
 .footer-links a:hover { color: var(--foam); }
+.footer small { font-size: .75rem; color: var(--label); }
 
-/* ── RESPONSIVE ─────────────────────────────────────────── */
+/* ── responsive ──────────────────────────────────────────── */
 @media (max-width: 860px) {
-  .nav-links {
-    position: fixed;
-    inset: 0 0 0 auto;
-    width: min(78vw, 300px);
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 1.75rem;
-    padding: var(--pad);
-    background: rgba(8, 13, 25, .97);
-    backdrop-filter: blur(16px);
-    border-left: 1px solid var(--hairline);
-    transform: translateX(100%);
-    transition: transform .4s cubic-bezier(.5, 0, .1, 1);
-  }
-  .nav-links.open { transform: translateX(0); }
-  .nav-links a { font-size: 1rem; }
-  .nav-toggle { display: flex; z-index: 55; }
-
-  /* less sky on a phone — the horizon should be in reach */
-  .harbor { padding-top: 4.5rem; }
-
   .record-grid,
   .band-grid { grid-template-columns: 1fr; }
-  .members { grid-template-columns: repeat(2, 1fr); }
+}
 
-  /* lamps become a swipeable waterfront */
-  .lamps {
-    grid-template-columns: repeat(5, 62%);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: .5rem;
-    scrollbar-width: none;
+@media (max-width: 720px) {
+  .nav-toggle { display: flex; }
+  .nav-links {
+    position: fixed;
+    inset: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 5.5rem var(--pad) 2rem;
+    background: var(--nav-glass-solid);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline);
+    transform: translateY(-100%);
+    transition: transform .35s cubic-bezier(.2, .7, .2, 1);
   }
-  .lamps::-webkit-scrollbar { display: none; }
-  .lamp { scroll-snap-align: start; }
-
-  .notice {
-    grid-template-columns: 1fr;
-    gap: .35rem;
-    padding: 1rem .25rem;
-  }
-  .notice-date, .notice-kind { display: inline; }
+  .nav-links.open { transform: translateY(0); }
+  .nav-links a { font-size: 1rem; }
 
   .show {
     grid-template-columns: 1fr auto;
-    gap: .4rem 1rem;
+    gap: .5rem 1rem;
   }
   .show-date { grid-column: 1 / -1; }
-  .show-cta, .show-sold { grid-column: 2; grid-row: 2; }
+  .members { grid-template-columns: repeat(2, 1fr); }
+  .footer { flex-direction: column; align-items: flex-start; }
 }
 
-@media (max-width: 520px) {
-  .members { grid-template-columns: 1fr; }
-  .lamps { grid-template-columns: repeat(5, 78%); }
-  .signup { flex-direction: column; }
-}
-
-/* ── REDUCED MOTION ─────────────────────────────────────── */
+/* ── reduced motion ──────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
-    animation-duration: .001ms !important;
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+    transition-duration: .01ms !important;
   }
 }
