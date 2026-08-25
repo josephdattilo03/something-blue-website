@@ -23,7 +23,7 @@ import {
    real, survived into git history, and was later mistaken for
    fact. Placeholder content must never be plausible.
    ════════════════════════════════════════════════════════════ */
-const DEMO = true;
+const DEMO = false;
 /* ════════════════════════════════════════════════════════════
    CONTENT — the only part you need to edit.
    Everything below the CONTENT block is machinery.
@@ -36,11 +36,22 @@ const REAL = {
   /* NOTICES — announcements, newest first. Sits under the
      waterline. Keep it to 1–3; it's a notice board, not a feed.
      An empty array [] renders a prompt. */
-  notices: [],
+  notices: [
+    {
+      date: "14 Jul 2026",
+      kind: "Demos",
+      text: "Listen to our last show!",
+      cta: "Recordings",
+      href: "#record",
+      image: { src: "assets/images/notices/01-1200.webp", alt: "Something Blue on stage" },
+    },
+  ],
 
   /* SHOWS — soonest first. Empty renders the "no dates" state,
      which is true right now, so it ships. */
-  shows: [],
+  shows: [
+    { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "#", sold: false },
+  ],
 
   /* LIVE — photos from stage. The Live section stays hidden
      until at least one entry has a real src, so there are never
@@ -57,17 +68,18 @@ const REAL = {
 
   /* THE BAND */
   band: {
-    since: "TK",                             // e.g. "2023"
-    bio1: "TK",
-    bio2: "TK",
+    since: "2025",                           // e.g. "2023"
+    bio1: "Out of an attic at 40th and Baltimore, Something Blue broke the \"no band leaves Penn\" curse. Now we're bringing our sound to the world.",
+    bio2: "Our sound comes from our members, with backgrounds spanning jazz, blues, rock, funk, and pop; we're excited to bring our unique blend to our home base in NYC and beyond.",
   },
 
   /* PEOPLE — add or remove freely; the grid adapts. */
   members: [
-    { name: "TK", role: "TK", photo: null },
-    { name: "TK", role: "TK", photo: null },
-    { name: "TK", role: "TK", photo: null },
-    { name: "TK", role: "TK", photo: null },
+    { name: "Arjun Arayan", role: "Guitar", photo: null },
+    { name: "Santiago C", role: "Guitar, Vocals", photo: null },
+    { name: "Joe Dattilo", role: "Drums and Percussion", photo: null },
+    { name: "Ariana Molkara", role: "Lead Vocals", photo: null },
+    { name: "Marc Vaz", role: "Bass, Vocals", photo: null },
   ],
 
   /* ELSEWHERE */
@@ -87,36 +99,36 @@ const PLACEHOLDER = {
      layout, which is exactly what DEMO is for and exactly what must
      never reach REAL. */
   notices: [
-    {
-      date: "14 Jul 2026",
-      kind: "Record",
-      text: "We're recording our first record.",
-      cta: "What we know",
-      href: "#record",
-      image: { src: "assets/images/notices/01-1200.webp", alt: "Something Blue on stage" },
-    },
-    {
-      date: "02 Jun 2026",
-      kind: "News",
-      text: "Placeholder notice. A second announcement sits here, about this long.",
-      cta: null,
-      href: null,
-      image: { src: "assets/images/notices/02-1200.webp", alt: "Something Blue on stage" },
-    },
-    {
-      date: "18 Apr 2026",
-      kind: "Show",
-      text: "Placeholder notice. This one has no picture, to prove a card without one still works.",
-      cta: "Placeholder link",
-      href: "#",
-      image: null,
-    },
+    // {
+    //   date: "14 Jul 2026",
+    //   kind: "Record",
+    //   text: "We're recording our first record.",
+    //   cta: "What we know",
+    //   href: "#record",
+    //   image: { src: "assets/images/notices/01-1200.webp", alt: "Something Blue on stage" },
+    // },
+    // {
+    //   date: "02 Jun 2026",
+    //   kind: "News",
+    //   text: "Placeholder notice. A second announcement sits here, about this long.",
+    //   cta: null,
+    //   href: null,
+    //   image: { src: "assets/images/notices/02-1200.webp", alt: "Something Blue on stage" },
+    // },
+    // {
+    //   date: "18 Apr 2026",
+    //   kind: "Show",
+    //   text: "Placeholder notice. This one has no picture, to prove a card without one still works.",
+    //   cta: "Placeholder link",
+    //   href: "#",
+    //   image: null,
+    // },
   ],
 
   shows: [
-    { date: "12 Sep", city: "City, ST", venue: "Venue Name", href: "#", sold: false },
-    { date: "04 Oct", city: "City, ST", venue: "Venue Name", href: "#", sold: true },
-    { date: "22 Nov", city: "City, ST", venue: "Venue Name", href: "#", sold: false },
+    // { date: "12 Sep", city: "City, ST", venue: "Venue Name", href: "#", sold: false },
+    // { date: "04 Oct", city: "City, ST", venue: "Venue Name", href: "#", sold: true },
+    // { date: "22 Nov", city: "City, ST", venue: "Venue Name", href: "#", sold: false },
   ],
 
   live: [],
@@ -257,8 +269,8 @@ $("#nowBody").innerHTML = notices.length
        }</span>
        <span class="signpost-arrow" aria-hidden="true">&darr;</span>
      </a>`
-  : `<span class="notice-empty">${chip}Your first announcement goes here — add it to
-     <code>notices</code> in script.js.</span>`;
+  : `<span class="notice-empty">Nothing to report right now.
+     <a href="#stay">Join our newsletter</a> and we'll email you when there is.</span>`;
 
 /* ── the notice gallery ──────────────────────────────────────
    Paged by hand and, if there is more than one, also on a slow
@@ -465,8 +477,8 @@ if (shows.length) {
       <li class="show">
         <span class="show-date">${field(s.date, "date")}</span>
         <span class="show-where">
-          <span class="show-city">${field(s.city, "city")}</span>
-          <span class="show-venue">${field(s.venue, "venue")}</span>
+          <span class="show-city">${field(s.venue, "venue")}</span>
+          <span class="show-venue">${field(s.city, "city")}</span>
         </span>
         ${s.sold
           ? `<span class="show-sold">Sold out</span>`
@@ -480,33 +492,36 @@ if (shows.length) {
   showsEyebrow.textContent = "No dates on the books";
   showsBody.innerHTML = `
     <div class="shows-empty">
-      <p>We're in the studio. When we play, the dates land here first.</p>
+      <p>We're busy cooking. When we play, you'll see gigs here first.</p>
       <a href="#stay">Get told about the first one</a>
     </div>`;
 }
 
-/* ── the record ──────────────────────────────────────────── */
-$("#recordBlurb").innerHTML = para(
-  record.blurb,
-  "What it sounds like, where you're tracking it, and who's making it with you. " +
-  "A paragraph in your own words — this is the most interesting thing about the " +
-  "band right now, so it's worth writing well.",
-  "body-text"
-);
+/* ── the record ── skipped while the section is commented out ── */
+const recordBlurb = $("#recordBlurb");
+if (recordBlurb) {
+  recordBlurb.innerHTML = para(
+    record.blurb,
+    "What it sounds like, where you're tracking it, and who's making it with you. " +
+    "A paragraph in your own words — this is the most interesting thing about the " +
+    "band right now, so it's worth writing well.",
+    "body-text"
+  );
 
-$("#recordFacts").innerHTML = [
-  ["Title", record.title],
-  ["Studio", record.studio],
-  ["Out", record.out],
-]
-  .map(
-    ([term, value]) => `
+  $("#recordFacts").innerHTML = [
+    ["Title", record.title],
+    ["Studio", record.studio],
+    ["Out", record.out],
+  ]
+    .map(
+      ([term, value]) => `
     <div class="fact">
       <dt>${term}</dt>
       <dd>${field(value, "")}</dd>
     </div>`
-  )
-  .join("");
+    )
+    .join("");
+}
 
 /* ── the band ────────────────────────────────────────────── */
 $("#bandSince").innerHTML = isTK(band.since)

@@ -348,11 +348,14 @@ a { color: inherit; text-decoration: none; }
   color: var(--haze);
   font-size: .92rem;
 }
-.notice-empty code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: .85em;
-  color: var(--foam);
+.notice-empty a {
+  font-weight: 600;
+  color: var(--haze);
+  border-bottom: 1px solid var(--hairline-lit);
+  padding-bottom: 1px;
+  transition: color .2s, border-color .2s;
 }
+.notice-empty a:hover { color: var(--foam); border-color: var(--foam); }
 
 /* ══ THE DESCENT ═════════════════════════════════════════════
    Below the waterline the page keeps sinking. The light falls
