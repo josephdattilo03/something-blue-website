@@ -50,7 +50,7 @@ const REAL = {
   /* SHOWS — soonest first. Empty renders the "no dates" state,
      which is true right now, so it ships. */
   shows: [
-    { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "#", sold: false },
+    { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "", sold: false },
   ],
 
   /* LIVE — photos from stage. The Live section stays hidden
@@ -75,8 +75,8 @@ const REAL = {
 
   /* PEOPLE — add or remove freely; the grid adapts. */
   members: [
-    { name: "Arjun Arayan", role: "Guitar", photo: null },
-    { name: "Santiago C", role: "Guitar, Vocals", photo: null },
+    { name: "Arjun Narayan", role: "Guitar", photo: null },
+    { name: "Santiago Cerchione", role: "Guitar, Vocals", photo: null },
     { name: "Joe Dattilo", role: "Drums and Percussion", photo: null },
     { name: "Ariana Molkara", role: "Lead Vocals", photo: null },
     { name: "Marc Vaz", role: "Bass, Vocals", photo: null },
@@ -84,9 +84,10 @@ const REAL = {
 
   /* ELSEWHERE */
   links: [
-    { label: "Instagram", href: "TK" },
-    { label: "Bandcamp", href: "TK" },
-    { label: "Booking", href: "TK" },
+    { label: "Instagram", href: "https://www.instagram.com/somethingblue_theband" },
+    { label: "Bandcamp", href: "https://somethingbluetheband.bandcamp.com" },
+    { label: "Booking", href: "mailto:somethingblue.shade@gmail.com" },
+
   ],
 };
 
@@ -481,8 +482,10 @@ if (shows.length) {
           <span class="show-venue">${field(s.city, "city")}</span>
         </span>
         ${s.sold
-          ? `<span class="show-sold">Sold out</span>`
-          : `<a class="show-cta" href="${escapeHtml(s.href || "#")}">Tickets</a>`
+          ? `<span class="show-status">Sold out</span>`
+          : s.href
+            ? `<a class="show-cta" href="${escapeHtml(s.href)}">Tickets</a>`
+            : `<span class="show-status">Tickets TBA</span>`
         }
       </li>`
     )
@@ -585,13 +588,15 @@ const email = $("#email");
 const formMsg = $("#formMsg");
 const validEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
-/* The form is a dead end: nothing is stored or sent. Until it's
-   wired to a real list, the page says so out loud rather than
-   thanking people for an address it threw away. */
+/* The list isn't live yet. Rather than show a working-looking
+   form that quietly throws every address away, hide it and say
+   so — the same rule the shows and notices empty states follow.
+   Swap this block out once there's a real list to join. */
 if (!DEMO) {
+  form.hidden = true;
+  formMsg.hidden = true;
   $("#formNote").innerHTML = `
-    <p class="form-note">${chip}This form isn't wired to a list yet — nothing typed into
-    it is stored or sent anywhere. Connect it before launch, or take it down.</p>`;
+    <p class="list-note">Our email list is still a work in progress — check back soon.</p>`;
 }
 
 form.addEventListener("submit", (e) => {
