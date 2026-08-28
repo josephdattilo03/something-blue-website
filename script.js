@@ -64,6 +64,15 @@ const REAL = {
     title: "TK",
     studio: "TK",
     out: "TK",
+
+    /* THE PLAYER — Bandcamp is the only thing that actually plays
+       audio here; the turntable next to it just turns.
+       Go to the track/album on Bandcamp → Share/Embed → Standard
+       embed → copy the whole <iframe> code Bandcamp gives you and
+       paste it here, as-is. This is trusted content (you're
+       pasting it, not a visitor), so it renders raw — no need to
+       rebuild width/height/params by hand. null = no player yet. */
+    bandcamp: null,
   },
 
   /* THE BAND */
@@ -73,13 +82,17 @@ const REAL = {
     bio2: "Our sound comes from our members, with backgrounds spanning jazz, blues, rock, funk, and pop; we're excited to bring our unique blend to our home base in NYC and beyond.",
   },
 
-  /* PEOPLE — add or remove freely; the grid adapts. */
+  /* PEOPLE — add or remove freely; the grid adapts.
+     photo is a stage shot cropped to a portrait frame by CSS
+     (object-fit: cover), not a pre-cropped headshot — photoPosition
+     only matters for the landscape ones, to keep the crop centered
+     on the person instead of on whoever else is in frame. */
   members: [
-    { name: "Arjun Narayan", role: "Guitar", photo: null },
-    { name: "Santiago Cerchione", role: "Guitar, Vocals", photo: null },
-    { name: "Joe Dattilo", role: "Drums and Percussion", photo: null },
+    { name: "Arjun Narayan", role: "Guitar", photo: "assets/images/people/arjun.webp", photoPosition: "45% center" },
+    { name: "Santiago Cerchione", role: "Guitar, Vocals", photo: "assets/images/people/santi.webp", photoPosition: "42% center" },
+    { name: "Joe Dattilo", role: "Drums and Percussion", photo: "assets/images/people/joe.webp" },
     { name: "Ariana Molkara", role: "Lead Vocals", photo: null },
-    { name: "Marc Vaz", role: "Bass, Vocals", photo: null },
+    { name: "Marc Vaz", role: "Bass, Vocals", photo: "assets/images/people/marc.webp" },
   ],
 
   /* ELSEWHERE */
@@ -142,6 +155,7 @@ const PLACEHOLDER = {
     title: "Working Title",
     studio: "Studio Name",
     out: "Date TBD",
+    bandcamp: null,
   },
 
   band: {
@@ -191,9 +205,24 @@ const banner = {
      sits there; two or more and it becomes a slow rotation. Zero,
      or a folder of broken paths, and the sky is just drawn. */
   images: [
-    { src: "assets/images/banner/01-1600.webp", src2x: "assets/images/banner/01-2400.webp" },
+    { src: "assets/images/banner/01-1600.webp" },
     { src: "assets/images/banner/02-1600.webp", src2x: "assets/images/banner/02-2400.webp" },
     { src: "assets/images/banner/03-1600.webp", src2x: "assets/images/banner/03-2400.webp" },
+    { src: "assets/images/banner/04-1600.webp", src2x: "assets/images/banner/04-2400.webp" },
+    { src: "assets/images/banner/05-1600.webp", src2x: "assets/images/banner/05-2400.webp" },
+    { src: "assets/images/banner/06-1600.webp", src2x: "assets/images/banner/06-2400.webp" },
+    { src: "assets/images/banner/07-1600.webp", src2x: "assets/images/banner/07-2400.webp" },
+    { src: "assets/images/banner/08-1600.webp", src2x: "assets/images/banner/08-2400.webp" },
+    { src: "assets/images/banner/09-1600.webp", src2x: "assets/images/banner/09-2400.webp" },
+    { src: "assets/images/banner/10-1600.webp", src2x: "assets/images/banner/10-2400.webp" },
+    { src: "assets/images/banner/11-1600.webp", src2x: "assets/images/banner/11-2400.webp" },
+    { src: "assets/images/banner/12-1600.webp", src2x: "assets/images/banner/12-2400.webp" },
+    { src: "assets/images/banner/13-1600.webp", src2x: "assets/images/banner/13-2400.webp" },
+    { src: "assets/images/banner/14-1600.webp", src2x: "assets/images/banner/14-2400.webp" },
+    { src: "assets/images/banner/15-1600.webp", src2x: "assets/images/banner/15-2400.webp" },
+    { src: "assets/images/banner/16-1600.webp", src2x: "assets/images/banner/16-2400.webp" },
+    { src: "assets/images/banner/17-1600.webp", src2x: "assets/images/banner/17-2400.webp" },
+    { src: "assets/images/banner/18-1600.webp", src2x: "assets/images/banner/18-2400.webp" },
   ],
   focus: 0.34,   /* 0 keeps the bulb grid, 1 keeps the floor */
   hold: 6500,    /* ms each image holds still */
@@ -500,18 +529,31 @@ if (shows.length) {
     </div>`;
 }
 
-/* ── the record ── skipped while the section is commented out ── */
-const recordBlurb = $("#recordBlurb");
-if (recordBlurb) {
-  recordBlurb.innerHTML = para(
+/* ── the record ── blurb and facts describe an album that doesn't
+   exist yet. While every field is still TK there's nothing true to
+   say, so each block stays hidden rather than presenting a wall of
+   TK chips — same rule as Live and Notices. Fill in even one field
+   and its block reappears; the rest still show TK per-field, same
+   as everywhere else on the page. ── */
+const hasBlurb = !isTK(record.blurb);
+const hasFacts = !isTK(record.title) || !isTK(record.studio) || !isTK(record.out);
+
+const recordBlurbEl = $("#recordBlurb");
+recordBlurbEl.hidden = !hasBlurb;
+if (hasBlurb) {
+  recordBlurbEl.innerHTML = para(
     record.blurb,
     "What it sounds like, where you're tracking it, and who's making it with you. " +
     "A paragraph in your own words — this is the most interesting thing about the " +
     "band right now, so it's worth writing well.",
     "body-text"
   );
+}
 
-  $("#recordFacts").innerHTML = [
+const recordFactsEl = $("#recordFacts");
+recordFactsEl.hidden = !hasFacts;
+if (hasFacts) {
+  recordFactsEl.innerHTML = [
     ["Title", record.title],
     ["Studio", record.studio],
     ["Out", record.out],
@@ -525,6 +567,51 @@ if (recordBlurb) {
     )
     .join("");
 }
+
+/* ── the player ── a drawn turntable, always turning.
+   Same rule as the hero canvas: the scene is drawn, not photographed,
+   and it never claims a state it doesn't know. The platter spins as
+   atmosphere — like the swell, it doesn't stop — and the tonearm
+   rests off the record rather than pretending to track a real needle
+   position. Bandcamp's embed is the only thing here that actually
+   plays audio or knows whether it's playing.
+
+   No embed, no player — same rule as Live: a section doesn't sit
+   around promising something that isn't there yet. ── */
+const player = $("#player");
+const recordGrid = $(".record-grid");
+if (!isTK(record.bandcamp)) {
+  $("#recordEyebrow").textContent = "Demos";
+  $("#recordTitle").textContent = "Listen";
+  recordGrid.classList.remove("solo");
+  player.hidden = false;
+  player.innerHTML = `
+    <div class="player-deck">
+      <div class="player-platter">
+        <div class="player-label"><span class="player-label-name">Something Blue</span></div>
+      </div>
+      <div class="player-arm" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <path class="player-arm-line" d="M80 8 L32 60" fill="none" />
+          <circle class="player-arm-pivot" cx="80" cy="8" r="6" fill="none" />
+          <circle class="player-arm-head" cx="32" cy="60" r="4" />
+        </svg>
+      </div>
+    </div>
+    <div class="player-embed">${record.bandcamp}</div>`;
+} else {
+  player.hidden = true;
+  player.innerHTML = "";
+  recordGrid.classList.add("solo");
+}
+
+const bandcampLink = links.find((l) => l.label === "Bandcamp");
+$("#recordCta").innerHTML = !isTK(record.bandcamp)
+  ? bandcampLink && !isTK(bandcampLink.href)
+    ? `More demos live on <a href="${escapeHtml(bandcampLink.href)}">Bandcamp</a>.`
+    : `More demos on the way.`
+  : `The songs land here when they're done.
+     <a href="#stay">Join the list</a> and you'll hear them first.`;
 
 /* ── the band ────────────────────────────────────────────── */
 $("#bandSince").innerHTML = isTK(band.since)
@@ -551,7 +638,8 @@ $("#members").innerHTML = members
     <li class="member">
       <div class="member-photo">
         ${m.photo
-        ? `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" loading="lazy" />`
+        ? `<img src="${escapeHtml(m.photo)}" alt="${escapeHtml(m.name)}" loading="lazy"
+             ${m.photoPosition ? `style="object-position: ${escapeHtml(m.photoPosition)}"` : ""} />`
         : /* there's no such thing as a dummy photograph — in demo the
                  frame just sits there quietly rather than shouting TK */
         DEMO
@@ -659,8 +747,18 @@ let stageBaked = [];     /* each graded to the sky, rendered once */
 
 /* where the rotation is, in real milliseconds */
 let bannerAt = 0;        /* index of the image currently held */
+let bannerNext = 0;      /* index it's crossing into — fixed for the whole fade */
 let bannerClock = 0;
 let bannerMix = 0;       /* 0 = holding, 1 = fully crossed into the next */
+let bannerReady = false; /* true once the rotation has picked its first image */
+
+/* A random index, never the one currently showing — the rotation
+   shouldn't hold on the same photo twice on the bounce. */
+function pickBannerIndex(current, length) {
+  if (length < 2) return 0;
+  const i = Math.floor(Math.random() * length);
+  return i === current ? (i + 1) % length : i;
+}
 
 if (banner && banner.images && banner.images.length) {
   /* the 2x file only earns its bytes on a wide or dense screen */
@@ -735,12 +833,30 @@ function bakeStage() {
     stageBaked.push(off);
   });
 
-  if (bannerAt >= stageBaked.length) { bannerAt = 0; bannerClock = 0; bannerMix = 0; }
+  /* the first photo to land picks where the rotation starts, so a
+     reload doesn't always open on image 01; later arrivals just
+     need bannerAt/bannerNext to stay valid as the array grows */
+  if (!bannerReady && stageBaked.length) {
+    bannerAt = Math.floor(Math.random() * stageBaked.length);
+    bannerNext = pickBannerIndex(bannerAt, stageBaked.length);
+    bannerReady = true;
+  } else if (bannerAt >= stageBaked.length) {
+    bannerAt = 0;
+    bannerNext = pickBannerIndex(0, stageBaked.length);
+    bannerClock = 0;
+    bannerMix = 0;
+  }
 }
 
 /* The rotation runs on real elapsed time, not frame count, so it
    keeps the same pace on a 60Hz and a 120Hz screen. Reduced motion
-   never calls this: it holds on the first frame forever. */
+   never calls this: it holds on the first frame forever.
+
+   Which photo comes next is random, not sequential — with this many
+   photos in the folder, counting 01 through 18 in order every time
+   would read as a slideshow, not a room with photos changing on the
+   wall. bannerNext is picked once per hold and held fixed through
+   the whole fade, so the crossfade always lands where it started. */
 function advanceBanner(dt) {
   if (stageBaked.length < 2) { bannerMix = 0; return; }
   bannerClock += dt;
@@ -750,7 +866,8 @@ function advanceBanner(dt) {
   }
   bannerMix = clamp((bannerClock - banner.hold) / banner.fade, 0, 1);
   if (bannerClock >= banner.hold + banner.fade) {
-    bannerAt = (bannerAt + 1) % stageBaked.length;
+    bannerAt = bannerNext;
+    bannerNext = pickBannerIndex(bannerAt, stageBaked.length);
     bannerClock = 0;
     bannerMix = 0;
   }
@@ -923,7 +1040,7 @@ function draw() {
     ctx.globalAlpha = scene.lamps * (1 - bannerMix);
     ctx.drawImage(held, 0, 0, w, baseY);
     if (bannerMix > 0) {
-      const next = stageBaked[(bannerAt + 1) % stageBaked.length];
+      const next = stageBaked[bannerNext];
       ctx.globalAlpha = scene.lamps * bannerMix;
       ctx.drawImage(next, 0, 0, w, baseY);
     }

@@ -680,6 +680,102 @@ a { color: inherit; text-decoration: none; }
 }
 .record-cta a:hover { border-color: var(--foam); }
 
+/* ── the player ── a drawn turntable, not a photo ─────────────
+   Same law as the hero canvas: the scene is drawn. The platter
+   turns as atmosphere, the same way the swell never stops — it is
+   not wired to Bandcamp's real playback state and never claims to
+   be. The grooves are concentric rings for the same reason the
+   hero's line is a waveform: this band's mark is "the same shape
+   read two ways." Bandcamp's embed is the only thing that plays
+   audio or knows if it's playing; nothing here fakes that. */
+.player {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+}
+.player[hidden] { display: none; }
+.player-deck {
+  position: relative;
+  width: min(100%, 20rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.player-platter {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    var(--water) 0,
+    var(--water) 5px,
+    var(--swell) 5px,
+    var(--swell) 6px
+  );
+  border: 1px solid var(--hairline-lit);
+  box-shadow: 0 1px 0 var(--hairline) inset, 0 1.5rem 3rem rgba(0, 0, 0, .35);
+  animation: platter-spin 8s linear infinite;
+}
+.player-platter::before {
+  /* one soft highlight, not a photographed reflection */
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(
+    115deg,
+    rgba(233, 240, 243, .09) 0%,
+    transparent 32%,
+    transparent 68%,
+    rgba(233, 240, 243, .05) 100%
+  );
+}
+@keyframes platter-spin {
+  to { transform: rotate(360deg); }
+}
+.player-label {
+  position: absolute;
+  inset: 33%;
+  border-radius: 50%;
+  background: var(--depth-1);
+  border: 1px solid var(--hairline-lit);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: .5rem;
+}
+.player-label-name {
+  font-family: var(--display);
+  font-variation-settings: 'opsz' 24, 'wght' 600, 'SOFT' 50, 'WONK' 1;
+  font-size: .78rem;
+  letter-spacing: .01em;
+  color: var(--haze);
+}
+.player-arm {
+  position: absolute;
+  top: -2%;
+  right: 4%;
+  width: 42%;
+  height: 62%;
+}
+.player-arm svg { width: 100%; height: 100%; overflow: visible; }
+.player-arm-line, .player-arm-pivot { stroke: var(--haze); stroke-width: 2.5; }
+.player-arm-pivot { fill: none; }
+.player-arm-head { fill: var(--haze); }
+.player-embed {
+  width: 100%;
+  max-width: 20rem;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.player-embed iframe { display: block; width: 100%; border: 0; }
+
+/* no player yet: the record-detail column takes the full width
+   rather than leaving an empty column where the deck would sit */
+.record-grid.solo { grid-template-columns: 1fr; }
+
 /* ── the band ────────────────────────────────────────────── */
 .band-grid {
   display: grid;
