@@ -690,13 +690,20 @@ a { color: inherit; text-decoration: none; }
    audio or knows if it's playing; nothing here fakes that. */
 .player {
   display: grid;
-  gap: 1.5rem;
-  justify-items: center;
+  grid-template-columns: minmax(6rem, 0.65fr) 1fr;
+  column-gap: 1.5rem;
+  row-gap: .4rem;
+  align-items: start;
 }
 .player[hidden] { display: none; }
 .player-deck {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: center;
   position: relative;
-  width: min(100%, 20rem);
+  width: 100%;
+  max-width: 12rem;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -764,17 +771,32 @@ a { color: inherit; text-decoration: none; }
 .player-arm-pivot { fill: none; }
 .player-arm-head { fill: var(--haze); }
 .player-embed {
+  grid-column: 2;
+  grid-row: 1;
   width: 100%;
-  max-width: 20rem;
   border-radius: 2px;
   overflow: hidden;
   border: 1px solid var(--hairline);
 }
 .player-embed iframe { display: block; width: 100%; border: 0; }
+.player .record-cta {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+}
 
 /* no player yet: the record-detail column takes the full width
    rather than leaving an empty column where the deck would sit */
 .record-grid.solo { grid-template-columns: 1fr; }
+
+/* solo also fires once there's a player but no detail text to sit
+   beside it (see hasDetailContent in script.js) — the player then
+   owns the whole row, so the deck's fixed 12rem cap (sized for a
+   ~46%-width column) reads as tiny next to a much wider embed.
+   Scale the deck's own track up to match instead of leaving it
+   pinned to the old width. */
+.record-grid.solo .player { grid-template-columns: minmax(8rem, 20rem) 1fr; }
+.record-grid.solo .player-deck { max-width: 20rem; }
 
 /* ── the band ────────────────────────────────────────────── */
 .band-grid {
@@ -944,6 +966,12 @@ a { color: inherit; text-decoration: none; }
   }
   .show-date { grid-column: 1 / -1; }
   .members { grid-template-columns: repeat(2, 1fr); }
+
+  .player-deck { display: none; }
+  .player,
+  .record-grid.solo .player { grid-template-columns: 1fr; }
+  .player-embed { grid-column: 1; grid-row: 1; }
+  .player .record-cta { grid-column: 1; grid-row: 2; }
   .footer { flex-direction: column; align-items: flex-start; }
   .footer-meta { align-items: flex-start; }
 }

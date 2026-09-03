@@ -51,6 +51,7 @@ const REAL = {
      which is true right now, so it ships. */
   shows: [
     { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "", sold: false },
+    { date: "16 Nov", city: "NYC", venue: "Arlene's Grocery", href: "", sold: false },
   ],
 
   /* LIVE — photos from stage. The Live section stays hidden
@@ -72,7 +73,7 @@ const REAL = {
        paste it here, as-is. This is trusted content (you're
        pasting it, not a visitor), so it renders raw — no need to
        rebuild width/height/params by hand. null = no player yet. */
-    bandcamp: null,
+    bandcamp: `<iframe style="border: 0; width: 100%; height: 470px;" src="https://bandcamp.com/EmbeddedPlayer/album=2666256256/size=large/bgcol=0b1a24/linkcol=e9f0f3/tracklist=true/artwork=small/transparent=true/" seamless><a href="https://somethingbluetheband.bandcamp.com/album/live-at-soho-live">Live at SoHo Live by Something Blue</a></iframe>`,
   },
 
   /* THE BAND */
@@ -91,7 +92,7 @@ const REAL = {
     { name: "Arjun Narayan", role: "Guitar", photo: "assets/images/people/arjun.webp", photoPosition: "45% center" },
     { name: "Santiago Cerchione", role: "Guitar, Vocals", photo: "assets/images/people/santi.webp", photoPosition: "42% center" },
     { name: "Joe Dattilo", role: "Drums and Percussion", photo: "assets/images/people/joe.webp" },
-    { name: "Ariana Molkara", role: "Lead Vocals", photo: null },
+    { name: "Ariana Molkara", role: "Lead Vocals", photo: "assets/images/people/ariana.webp", photoPosition: "48% center" },
     { name: "Marc Vaz", role: "Bass, Vocals", photo: "assets/images/people/marc.webp" },
   ],
 
@@ -580,10 +581,18 @@ if (hasFacts) {
    around promising something that isn't there yet. ── */
 const player = $("#player");
 const recordGrid = $(".record-grid");
+const recordCtaEl = $("#recordCta");
+/* the detail column (blurb + facts) is empty until the record is
+   real; the cta moves into the player itself below, so it doesn't
+   count toward "has content." An empty column would otherwise sit
+   there as dead space while the player is squeezed into half the
+   width — so go full width and let the player fill it, same as
+   the "no bandcamp yet" case below. */
+const hasDetailContent = hasBlurb || hasFacts;
 if (!isTK(record.bandcamp)) {
   $("#recordEyebrow").textContent = "Demos";
   $("#recordTitle").textContent = "Listen";
-  recordGrid.classList.remove("solo");
+  recordGrid.classList.toggle("solo", !hasDetailContent);
   player.hidden = false;
   player.innerHTML = `
     <div class="player-deck">
@@ -599,6 +608,7 @@ if (!isTK(record.bandcamp)) {
       </div>
     </div>
     <div class="player-embed">${record.bandcamp}</div>`;
+  player.appendChild(recordCtaEl);
 } else {
   player.hidden = true;
   player.innerHTML = "";
@@ -606,7 +616,7 @@ if (!isTK(record.bandcamp)) {
 }
 
 const bandcampLink = links.find((l) => l.label === "Bandcamp");
-$("#recordCta").innerHTML = !isTK(record.bandcamp)
+recordCtaEl.innerHTML = !isTK(record.bandcamp)
   ? bandcampLink && !isTK(bandcampLink.href)
     ? `More demos live on <a href="${escapeHtml(bandcampLink.href)}">Bandcamp</a>.`
     : `More demos on the way.`
