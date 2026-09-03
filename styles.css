@@ -774,6 +774,13 @@ a { color: inherit; text-decoration: none; }
   grid-column: 2;
   grid-row: 1;
   width: 100%;
+  /* Bandcamp's "large" embed is a fixed-width (700px) document
+     inside the iframe, not a fluid one. transparent=true in the
+     embed URL means anything past that width is see-through, so
+     stretching the iframe wider just reveals the page background
+     as a seam down the right edge. Cap it at the real content
+     width so it never opens that gap. */
+  max-width: 700px;
   border-radius: 2px;
   overflow: hidden;
   border: 1px solid var(--hairline);
