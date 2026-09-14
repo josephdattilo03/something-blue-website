@@ -51,7 +51,7 @@ const REAL = {
      which is true right now, so it ships. */
   shows: [
     { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "https://tickets.venuepilot.com/e/breaking-sound-presents-2026-10-10-soho-live-new-york-319627", sold: false },
-    { date: "6 Nov", city: "NYC", venue: "Arlene's Grocery", href: "https://www.arlenesgrocerynyc.com/upcoming-events", sold: false },
+    { date: "6 Nov", city: "NYC", venue: "Arlene's Grocery", href: "https://aftontickets.com/event/buyticket/l3x30n4zxd/something-blue-allison-phillips-tbd", sold: false },
   ],
 
   /* LIVE — photos from stage. The Live section stays hidden
