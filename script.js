@@ -51,7 +51,6 @@ const REAL = {
      which is true right now, so it ships. */
   shows: [
     { date: "10 Oct", city: "NYC", venue: "SoHo Live", href: "https://tickets.venuepilot.com/e/breaking-sound-presents-2026-10-10-soho-live-new-york-319627", sold: false },
-    { date: "6 Nov", city: "NYC", venue: "Arlene's Grocery", href: "https://aftontickets.com/event/buyticket/l3x30n4zxd/something-blue-allison-phillips-tbd", sold: false },
   ],
 
   /* LIVE — photos from stage. The Live section stays hidden
@@ -499,10 +498,15 @@ if (realShots.length) {
 const showsEyebrow = $("#showsEyebrow");
 const showsBody = $("#showsBody");
 
-if (shows.length) {
-  const n = shows.length;
+/* Hide gigs once their day is over. shortcut: dates have no year, so they're
+   read as this year — a January gig listed in December would vanish; add years then. */
+const today = new Date().setHours(0, 0, 0, 0);
+const upcoming = shows.filter((s) => new Date(`${s.date} ${new Date().getFullYear()}`) >= today);
+
+if (upcoming.length) {
+  const n = upcoming.length;
   showsEyebrow.textContent = `${n} date${n === 1 ? "" : "s"} on the books`;
-  showsBody.innerHTML = `<ul class="show-list">${shows
+  showsBody.innerHTML = `<ul class="show-list">${upcoming
     .map(
       (s) => `
       <li class="show">
